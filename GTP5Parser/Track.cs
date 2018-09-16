@@ -5,13 +5,6 @@ using System.IO;
 
 namespace GTP5Parser
 {
-    public struct TrackColor
-    {
-        public byte Red;
-        public byte Green;
-        public byte Blue;
-    }
-
     public struct BarSize
     {
         public byte Up;
@@ -24,7 +17,7 @@ namespace GTP5Parser
 
         public string Title;
 
-        public TrackColor Color;
+        public Color Color;
 
         public int StringsCount;
         public int[] Tuning;

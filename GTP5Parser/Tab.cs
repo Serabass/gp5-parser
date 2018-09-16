@@ -70,6 +70,9 @@ namespace GTP5Parser
                 tab.LyricsArray.Add(lyrics);
             }
 
+            int xxx = reader.ReadInt32();
+            int xxx2 = reader.ReadInt32();
+            
             reader.BaseStream.Seek(0x21E, SeekOrigin.Begin);
 
             tab.Template = new Template();
@@ -110,6 +113,9 @@ namespace GTP5Parser
             byte down = reader.ReadByte();
             byte[] unk13 = reader.ReadBytes(2);
             byte[] link8notes = reader.ReadBytes(4);
+
+
+
             for (var i = 0; i < tracksCount; i++)
             {
                 var track = new Track();
@@ -133,7 +139,7 @@ namespace GTP5Parser
                 track.Capo = reader.ReadInt32();
                 reader.BaseStream.Seek(0x5D, SeekOrigin.Begin);
                 var color = reader.ReadBytes(3);
-                track.Color = new TrackColor()
+                track.Color = new Color()
                 {
                     Red = color[0],
                     Green = color[1],
