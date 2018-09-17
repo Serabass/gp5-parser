@@ -8,7 +8,7 @@ namespace GTP5Parser
 {
     class Lyrics
     {
-        public int Start;
-        public string Content;
+        public MemoryBlock<int> Start;
+        public MemoryBlock<string> Content;
     }
 }

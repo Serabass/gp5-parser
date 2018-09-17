@@ -8,7 +8,7 @@ namespace GTP5Parser
 {
     class Bookmark
     {
-        public string Title;
+        public MemoryBlock<string> Title;
         public Color Color;
     }
 }

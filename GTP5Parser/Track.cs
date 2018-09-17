@@ -14,15 +14,25 @@ namespace GTP5Parser
     class Track
     {
         public const int TRACK_BLOCK_LENGTH = 0xBD;
-
-        public string Title;
+        
+        public MemoryBlock<byte> Flags;
+        public MemoryBlock<byte> Flags2;
+        public MemoryBlock<string> Title;
 
         public Color Color;
 
-        public int StringsCount;
-        public int[] Tuning;
-        public int BarsCount;
-        public int Capo;
+        public MemoryBlock<int> StringsCount;
+        public MemoryBlock<int>[] Tuning;
+        public MemoryBlock<int> BarsCount;
+        public MemoryBlock<int> Capo;
+        public MemoryBlock<int> Port;
+        public MemoryBlock<int> MainChannel;
+        public MemoryBlock<int> EffectChannel;
+        public MemoryBlock<byte> MidiBank;
+
+        public TrackMeta Meta;
+
+
 
         public static Track FromReader(BinaryReader reader)
         {

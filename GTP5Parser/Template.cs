@@ -8,16 +8,16 @@ namespace GTP5Parser
 {
     class Template
     {
-        public string Title;
-        public string Subtitle;
-        public string Artist;
-        public string Album;
-        public string WordsBy;
-        public string MusicBy;
-        public string WordsAndMusicBy;
-        public string Copyright;
-        public string Rights;
-        public string Page;
-        public string Moderate;
+        public MemoryBlock<string> Title;
+        public MemoryBlock<string> Subtitle;
+        public MemoryBlock<string> Artist;
+        public MemoryBlock<string> Album;
+        public MemoryBlock<string> WordsBy;
+        public MemoryBlock<string> MusicBy;
+        public MemoryBlock<string> WordsAndMusicBy;
+        public MemoryBlock<string> Copyright;
+        public MemoryBlock<string> Rights;
+        public MemoryBlock<string> Page;
+        public MemoryBlock<string> Moderate;
     }
 }
