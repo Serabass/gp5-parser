@@ -133,13 +133,14 @@ namespace GTP5Parser
 
         public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<MyBinaryReader, TStruct> action) where TStruct : new()
         {
-            var offset = this.BaseStream.Position;
+            var offset = BaseStream.Position;
             var s = new TStruct();
             action(this, s);
             return new MemoryBlock<TStruct>
             {
                 Value = s,
-                Offset = offset
+                Offset = offset,
+                Size = BaseStream.Position - offset
             };
         }
 
