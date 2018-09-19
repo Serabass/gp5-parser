@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class Template
+    public class Template
     {
         public MemoryBlock<string> Title;
         public MemoryBlock<string> Subtitle;

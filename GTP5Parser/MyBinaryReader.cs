@@ -23,13 +23,13 @@ namespace GTP5Parser
             var offset = BaseStream.Position;
             var strLength = ReadByte();
             var bytes = ReadBytes(strLength.Value);
-            byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
-            var result = win1251.GetString(win1251Bytes);
+            // byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
+            var result = win1251.GetString(bytes.Value);
             return new MemoryBlock<string>()
             {
                 Value = result,
                 Offset = offset,
-                Size = strLength.Value + 1
+                Size = strLength.Value + sizeof(byte)
             };
         }
 
@@ -38,6 +38,28 @@ namespace GTP5Parser
             var result = ReadString();
             ReadBytes(maxBytes - result.Value.Length);
             return result;
+        }
+
+        public new MemoryBlock<float> ReadSingle()
+        {
+            var offset = BaseStream.Position;
+            var result = base.ReadSingle();
+            return new MemoryBlock<float>()
+            {
+                Offset = offset,
+                Value = result
+            };
+        }
+
+        public new MemoryBlock<double> ReadDouble()
+        {
+            var offset = BaseStream.Position;
+            var result = base.ReadDouble();
+            return new MemoryBlock<double>()
+            {
+                Offset = offset,
+                Value = result
+            };
         }
 
         public new MemoryBlock<int> ReadInt32()
@@ -95,6 +117,17 @@ namespace GTP5Parser
             };
         }
 
+        public new MemoryBlock<char> ReadChar()
+        {
+            var offset = BaseStream.Position;
+            var result = base.ReadChar();
+            return new MemoryBlock<char>()
+            {
+                Offset = offset,
+                Value = result
+            };
+        }
+
         public new MemoryBlock<sbyte> ReadSByte()
         {
             var offset = BaseStream.Position;
@@ -127,7 +160,8 @@ namespace GTP5Parser
             return new MemoryBlock<string>()
             {
                 Value = result,
-                Offset = offset
+                Offset = offset,
+                Size = stringLength + sizeof(int)
             };
         }
 
@@ -149,10 +183,81 @@ namespace GTP5Parser
             lastSkipped = ReadBytes(count);
         }
 
+        public void SkipWhile(Func<bool> callback)
+        {
+            while (true)
+            {
+                var lastPosition = BaseStream.Position;
+                if (!callback())
+                {
+                    BaseStream.Seek(lastPosition, SeekOrigin.Begin);
+                    break;
+                }
+            }
+        }
+
+        public void SkipWhile(byte b)
+        {
+            SkipWhile(() => ReadByte().Value == b);
+        }
+
+        public void SkipWhile(int b)
+        {
+            SkipWhile(() => ReadInt32().Value == b);
+        }
+
+        public void SkipWhile(float b)
+        {
+            SkipWhile(() => ReadSingle().Value == b);
+        }
+
+        public void SkipWhile(double b)
+        {
+            SkipWhile(() => ReadDouble().Value == b);
+        }
+
+        public void SkipWhile(bool b)
+        {
+            SkipWhile(() => ReadBoolean().Value == b);
+        }
+
+        public void SkipWhile(char b)
+        {
+            SkipWhile(() => ReadChar().Value == b);
+        }
+        
+        public void Back(int step)
+        {
+            BaseStream.Seek(BaseStream.Position - step, SeekOrigin.Begin);
+        }
+
+        public Color ReadColor()
+        {
+            var color = ReadBytes(3);
+            return Color.FromBytes(color.Value);
+        }
+
         [Obsolete]
         public void Jump(long offset)
         {
             BaseStream.Seek(offset, SeekOrigin.Begin);
+        }
+
+        public MemoryBlock<byte[]> ReadToEnd()
+        {
+            long offset = BaseStream.Position;
+            var result = new List<byte>();
+
+            while (BaseStream.Length > BaseStream.Position)
+            {
+                result.Add(ReadByte().Value);
+            }
+
+            return new MemoryBlock<byte[]> {
+                Offset = offset,
+                Value = result.ToArray(),
+                Size = result.Count
+            };
         }
     }
 }

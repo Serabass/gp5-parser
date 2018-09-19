@@ -16,5 +16,10 @@ namespace GTP5Parser
         public byte Red;
         public byte Green;
         public byte Blue;
+
+        public new string ToString()
+        {
+            return $"{Red},{Green},{Blue}";
+        }
     }
 }

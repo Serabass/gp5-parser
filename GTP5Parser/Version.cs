@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    struct Version
+    public struct Version
     {
         public int Major;
         public int Minor;

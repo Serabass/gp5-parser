@@ -11,7 +11,7 @@ namespace GTP5Parser
         public byte Down;
     }
 
-    class Track
+    public class Track
     {
         public const int TRACK_BLOCK_LENGTH = 0xBD;
         
@@ -22,8 +22,8 @@ namespace GTP5Parser
         public Color Color;
 
         public MemoryBlock<int> StringsCount;
-        public MemoryBlock<int>[] Tuning;
-        public MemoryBlock<int> BarsCount;
+        public MemoryBlock<Note>[] Tuning;
+        public MemoryBlock<int> FretCount;
         public MemoryBlock<int> Capo;
         public MemoryBlock<int> Port;
         public MemoryBlock<int> MainChannel;

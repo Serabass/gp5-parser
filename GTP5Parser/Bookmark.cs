@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class Bookmark
+    public class Bookmark
     {
         public MemoryBlock<string> Title;
         public Color Color;

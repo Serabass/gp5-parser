@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class Lyrics
+    public class Lyrics
     {
         public MemoryBlock<int> Start;
         public MemoryBlock<string> Content;

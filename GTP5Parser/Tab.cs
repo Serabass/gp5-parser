@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class Tab
+    public class Tab
     {
         public Version Version = new Version();
 
@@ -34,8 +34,15 @@ namespace GTP5Parser
         public MemoryBlock<short> Moderate;
         public MemoryBlock<bool> HideTempo;
 
-        public List<MidiInstruments> Instruments = new List<MidiInstruments>();
+        public MemoryBlock<int> BarCount;
+        public MemoryBlock<int> TracksCount;
+        public MemoryBlock<byte> Up;
+        public MemoryBlock<byte> Down;
+        public MemoryBlock<byte[]> KeySigns;
+        public MemoryBlock<byte[]> Link8Notes;
 
+        public List<MidiInstruments> Instruments = new List<MidiInstruments>();
+        public List<Bookmark> Bookmarks = new List<Bookmark>();
         
 
         public static Tab FromStream(Stream stream)
@@ -115,7 +122,7 @@ namespace GTP5Parser
 
                 List<TrackMeta> TrackMeta = new List<TrackMeta>();
 
-                for (var i = 0; i < 64; i++)
+                for (var i = 0; i < 55; i++)
                 {
                     var offset = reader.BaseStream.Position;
 
@@ -134,61 +141,64 @@ namespace GTP5Parser
                     TrackMeta.Add(trackMeta);
                 }
 
-                reader.Skip(42);
-                var barCount = reader.ReadInt32();
-                var tracksCount = reader.ReadInt32();
+                reader.Skip(54);
+                tab.BarCount = reader.ReadInt32();
+                tab.TracksCount = reader.ReadInt32();
                 var unk12 = reader.ReadByte();
-                var up = reader.ReadByte();
-                var down = reader.ReadByte();
-                var keySigns = reader.ReadBytes(2);
-                var link8notes = reader.ReadBytes(2);
-                
-                for (var i = 0; i < 4; i++)
+                tab.Up = reader.ReadByte();
+                tab.Down = reader.ReadByte();
+                tab.KeySigns = reader.ReadBytes(2);
+                tab.Link8Notes = reader.ReadBytes(4);
+
+                // reader.Skip(16);
+
+                while (true)
                 {
+                    reader.SkipWhile(() => reader.ReadByte().Value == 0x00);
+                    if (reader.ReadByte().Value == 0x08)
+                    {
+                        reader.Back(1);
+                        break;
+                    }
+                    reader.Back(1);
+                    var i80 = reader.ReadInt32();
+                    reader.Skip(5);
                     var bookmark = new Bookmark();
                     bookmark.Title = reader.ReadString();
-                    var col = reader.ReadBytes(3);
-                    bookmark.Color = Color.FromBytes(col.Value);
-                    var data = reader.ReadBytes(0x13);
+                    bookmark.Color = reader.ReadColor();
+                    tab.Bookmarks.Add(bookmark);
                 }
                 
-                for (var i = 0; i < tracksCount.Value; i++)
+                for (var i = 0; i < tab.TracksCount.Value; i++)
                 {
                     var track = new Track();
                     track.Flags = reader.ReadByte();
                     track.Meta = TrackMeta[i];
                     track.Title = reader.ReadString(0x28);
                     track.StringsCount = reader.ReadInt32();
-                    track.Tuning = new MemoryBlock<int>[track.StringsCount.Value];
+                    track.Tuning = new MemoryBlock<Note>[track.StringsCount.Value];
 
                     for (var o = 0; o < track.StringsCount.Value; o++)
                     {
                         var str = reader.ReadInt32();
-                        track.Tuning[o] = str;
+                        track.Tuning[o] = new MemoryBlock<Note>(new Note(str.Value));
                     }
                     
                     var remainingStringTuningData = reader.ReadBytes((7 - track.StringsCount.Value) * 4);
                     track.Port = reader.ReadInt32();
                     track.MainChannel = reader.ReadInt32();
                     track.EffectChannel = reader.ReadInt32();
-                    track.BarsCount = reader.ReadInt32();
+                    track.FretCount = reader.ReadInt32();
                     track.Capo = reader.ReadInt32();
-                    var color = reader.ReadBytes(3);
-                    track.Color = Color.FromBytes(color.Value);
-                    reader.Skip(2);
-                    track.Flags2 = reader.ReadByte();
-                    reader.Skip(1);
-                    track.MidiBank = reader.ReadByte();
-                    var o1 = reader.ReadBytes(4);
-                    var o2 = reader.ReadBytes(5);
-                    var o3 = reader.ReadBytes(4);
-                    var o4 = reader.ReadBytes(10);
-                    var o5 = reader.ReadBytes(1);
-                    var xxxx = reader.ReadByte();
-                    var o5_1 = reader.ReadBytes(16);
-                    var o6 = reader.ReadBytes(14);
+                    track.Color = reader.ReadColor();
+                    reader.Skip(0x36);
+                    var o0 = reader.ReadString();
+                    var o1 = reader.ReadInt32();
+                    var o2 = reader.ReadString();
                     tab.AddTrack(track);
                 }
+
+                var a = reader.ReadToEnd();
 
                 reader.Close();
                 reader.Dispose();
