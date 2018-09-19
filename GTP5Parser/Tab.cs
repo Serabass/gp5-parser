@@ -198,6 +198,34 @@ namespace GTP5Parser
                     tab.AddTrack(track);
                 }
 
+                reader.Skip(6);
+
+                var length = reader.ReadSByte();
+
+                var stringsBits = reader.ReadByte();
+
+                List<bool> bits = new List<bool>();
+
+                for (var i = 0; i < 8; i++) // 00100100
+                {
+                    var bit = (stringsBits.Value & (1 << i - 1)) != 0;
+                    bits.Add(bit);
+                }
+
+                var notesCount = bits.Count(b => b == true);
+
+                var frets = new List<byte>();
+
+                for (var i = 0; i < notesCount; i++)
+                {
+                    var flags = reader.ReadByte();
+                    var unk__2 = reader.ReadByte();
+                    var flags2 = reader.ReadByte();
+                    var fret = reader.ReadByte();
+                    var unk__4 = reader.ReadByte();
+                    frets.Add(fret.Value);
+                }
+                
                 var a = reader.ReadToEnd();
 
                 reader.Close();
