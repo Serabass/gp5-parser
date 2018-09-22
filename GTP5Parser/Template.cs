@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    public class Template
+    public class Template : IDisposable
     {
         public MemoryBlock<string> Title;
         public MemoryBlock<string> Subtitle;
@@ -19,5 +19,20 @@ namespace GTP5Parser
         public MemoryBlock<string> Rights;
         public MemoryBlock<string> Page;
         public MemoryBlock<string> Moderate;
+
+        public void Dispose()
+        {
+            Title = null;
+            Subtitle = null;
+            Artist = null;
+            Album = null;
+            WordsBy = null;
+            MusicBy = null;
+            WordsAndMusicBy = null;
+            Copyright = null;
+            Rights = null;
+            Page = null;
+            Moderate = null;
+        }
     }
 }

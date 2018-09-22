@@ -10,7 +10,7 @@ namespace GTP5ParserTests
         [TestMethod]
         public void TestMethod1()
         {
-            Tab tab = Tab.FromFile("tab1.gp5");
+            Tab tab = Tab.FromFile("re.gp5");
             Assert.Equals(tab.BarCount, 10);
             Assert.Equals(tab.Up, 6);
             Assert.Equals(tab.Down, 4);

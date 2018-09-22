@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    public class Bookmark
+    public class Bookmark : IDisposable
     {
         public MemoryBlock<string> Title;
         public Color Color;
+
+        public void Dispose()
+        {
+            Title = null;
+            Color = null;
+        }
     }
 }

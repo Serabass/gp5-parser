@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace GTP5Parser
 {
     public class MemoryBlock<T>

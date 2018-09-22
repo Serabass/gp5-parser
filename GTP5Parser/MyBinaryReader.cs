@@ -165,14 +165,28 @@ namespace GTP5Parser
             };
         }
 
-        public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<MyBinaryReader, TStruct> action) where TStruct : new()
+        [Obsolete]
+        public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<MyBinaryReader, TStruct> action) where TStruct : IDisposable, new()
         {
             var offset = BaseStream.Position;
-            var s = new TStruct();
-            action(this, s);
+            var structObject = new TStruct();
+            action(this, structObject);
             return new MemoryBlock<TStruct>
             {
-                Value = s,
+                Value = structObject,
+                Offset = offset,
+                Size = BaseStream.Position - offset
+            };
+        }
+
+        public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<TStruct> action) where TStruct : IDisposable, new()
+        {
+            var offset = BaseStream.Position;
+            var structObject = new TStruct();
+            action(structObject);
+            return new MemoryBlock<TStruct>
+            {
+                Value = structObject,
                 Offset = offset,
                 Size = BaseStream.Position - offset
             };
@@ -225,8 +239,8 @@ namespace GTP5Parser
         {
             SkipWhile(() => ReadChar().Value == b);
         }
-        
-        public void Back(int step)
+
+        public void Back(int step = 1)
         {
             BaseStream.Seek(BaseStream.Position - step, SeekOrigin.Begin);
         }
@@ -253,7 +267,8 @@ namespace GTP5Parser
                 result.Add(ReadByte().Value);
             }
 
-            return new MemoryBlock<byte[]> {
+            return new MemoryBlock<byte[]>
+            {
                 Offset = offset,
                 Value = result.ToArray(),
                 Size = result.Count
