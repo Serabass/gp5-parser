@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class TabReader : MyBinaryReader
+    class TabReader : BinaryReader
     {
-        private Stream stream;
+        readonly Stream stream;
+
+        public static string[] SupportedVersions = {
+            "v5.10"
+        };
 
         private List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
         private int TrackMetaIterator;
+
+        private bool atEnd => BaseStream.Position >= BaseStream.Length;
 
         public static Tab ReadTabFromStream(Stream stream)
         {
@@ -32,6 +36,115 @@ namespace GTP5Parser
             {
                 return tab2;
             }
+        }
+
+        private void ReadStructTab(Tab tab)
+        {
+            var VersionString = ReadString();
+            var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
+
+            if (!SupportedVersions.Contains(match.Value))
+            {
+                throw new Exception($"Version {VersionString.Value} is not supported yet");
+            }
+
+            tab.Version.Major = int.Parse(match.Groups["major"].Value);
+            tab.Version.Minor = int.Parse(match.Groups["minor"].Value);
+            var unk = ReadBytes(10);
+            tab.Title = ReadString();
+            var unk2 = ReadInt32();
+            tab.Subtitle = ReadString();
+            var unk3 = ReadInt32();
+            tab.Artist = ReadString();
+            var unk4 = ReadInt32();
+            tab.Album = ReadString();
+            var unk5 = ReadInt32();
+            tab.LyricsBy = ReadString();
+            var unk6 = ReadInt32();
+            tab.Music = ReadString();
+            var unk7 = ReadInt32();
+            tab.Copy = ReadString();
+            var unk8 = ReadInt32();
+            tab.TabAuthor = ReadString();
+            var unk9 = ReadInt32();
+            tab.Instructions = ReadString();
+            var unk10 = ReadInt32();
+            var unk10_1 = ReadInt32();
+            tab.Notes = ReadString();
+            tab.LyricsTrack = ReadInt32();
+
+            for (int i = 0; i < 5; i++)
+            {
+                var lyrics = ReadStruct<Lyrics>(ReadStructLyrics).Value;
+                tab.LyricsArray.Add(lyrics);
+            }
+
+            Debugger.Break();
+            switch (tab.Version.Minor)
+            {
+                case 0:
+                    Skip(0x1E);
+                    break;
+                case 10:
+                    Skip(0x35);
+                    break;
+            }
+
+            tab.Template = ReadStruct<Template>(ReadStructTemplate).Value;
+
+            tab.Moderate = ReadInt16();
+            Skip(0x02);
+            tab.HideTempo = ReadBoolean();
+            Skip(0x05);
+
+            for (TrackMetaIterator = 0; TrackMetaIterator < 64; TrackMetaIterator++)
+            {
+                TrackMetaArray.Add(ReadStruct<TrackMeta>(ReadStructTrackMeta).Value);
+            }
+
+            Skip(0x26);
+            var unk13 = ReadInt32();
+            tab.BarCount = ReadInt32();
+            tab.TracksCount = ReadInt32();
+            var unk12 = ReadByte();
+            tab.Up = ReadByte();
+            tab.Down = ReadByte();
+            tab.KeySigns = ReadBytes(2);
+            tab.Link8Notes = ReadBytes(4);
+
+            // Skip(16);
+            while (true)
+            {
+                SkipWhile(() => ReadByte().Value == 0x00);
+                if (ReadByte().Value == 0x08)
+                {
+                    Back();
+                    break;
+                }
+                Back();
+                var i80 = ReadInt32();
+                Skip(5);
+                tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
+            }
+
+            for (var i = 0; i < tab.TracksCount.Value; i++)
+            {
+                tab.AddTrack(ReadStruct<Track>(ReadStructTrack).Value);
+            }
+
+            Skip(5);
+
+            var xx = 0;
+
+            while (!atEnd)
+            {
+                xx++;
+                tab.Chords.Add(ReadStruct<Chord>(ReadStructChord).Value);
+            }
+
+            Close();
+            Dispose();
+            Debugger.Break();
         }
 
         private void ReadStructLyrics(Lyrics lyrics)
@@ -142,100 +255,5 @@ namespace GTP5Parser
             bookmark.Color = ReadColor();
         }
 
-        private void ReadStructTab(Tab tab)
-        {
-            var VersionString = ReadString();
-            var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
-            tab.Version.Major = int.Parse(match.Groups["major"].Value);
-            tab.Version.Minor = int.Parse(match.Groups["minor"].Value);
-            var unk = ReadBytes(10);
-            tab.Title = ReadString();
-            var unk2 = ReadInt32();
-            tab.Subtitle = ReadString();
-            var unk3 = ReadInt32();
-            tab.Artist = ReadString();
-            var unk4 = ReadInt32();
-            tab.Album = ReadString();
-            var unk5 = ReadInt32();
-            tab.LyricsBy = ReadString();
-            var unk6 = ReadInt32();
-            tab.Music = ReadString();
-            var unk7 = ReadInt32();
-            tab.Copy = ReadString();
-            var unk8 = ReadInt32();
-            tab.Nabor = ReadString();
-            var unk9 = ReadInt32();
-            tab.Instr = ReadString();
-            var unk10 = ReadInt32();
-            var unk10_1 = ReadInt32();
-            tab.Notes = ReadString();
-            tab.LyricsTrack = ReadInt32();
-
-            for (int i = 0; i < 5; i++)
-            {
-                var lyrics = ReadStruct<Lyrics>(ReadStructLyrics).Value;
-                tab.LyricsArray.Add(lyrics);
-            }
-
-            MemoryBlock<byte[]> a_0 = ReadBytes(21);
-            MemoryBlock<byte[]> a_1 = ReadBytes(16);
-            MemoryBlock<byte[]> a_2 = ReadBytes(16);
-
-            tab.Template = ReadStruct<Template>(ReadStructTemplate).Value;
-
-            tab.Moderate = ReadInt16();
-            Skip(2);
-            tab.HideTempo = ReadBoolean();
-            Skip(5);
-
-            for (TrackMetaIterator = 0; TrackMetaIterator < 55; TrackMetaIterator++)
-            {
-                TrackMetaArray.Add(ReadStruct<TrackMeta>(ReadStructTrackMeta).Value);
-            }
-
-            Skip(54);
-            tab.BarCount = ReadInt32();
-            tab.TracksCount = ReadInt32();
-            var unk12 = ReadByte();
-            tab.Up = ReadByte();
-            tab.Down = ReadByte();
-            tab.KeySigns = ReadBytes(2);
-            tab.Link8Notes = ReadBytes(4);
-
-            // reader.Skip(16);
-
-            while (true)
-            {
-                SkipWhile(() => ReadByte().Value == 0x00);
-                if (ReadByte().Value == 0x08)
-                {
-                    Back();
-                    break;
-                }
-                Back();
-                var i80 = ReadInt32();
-                Skip(5);
-                tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
-            }
-
-            for (var i = 0; i < tab.TracksCount.Value; i++)
-            {
-                tab.AddTrack(ReadStruct<Track>(ReadStructTrack).Value);
-            }
-
-            Skip(5);
-
-            var xx = 0;
-
-            while (BaseStream.Length > BaseStream.Position)
-            {
-                xx++;
-                tab.Chords.Add(ReadStruct<Chord>(ReadStructChord).Value);
-            }
-
-            Close();
-            Dispose();
-            Debugger.Break();
-        }
     }
 }

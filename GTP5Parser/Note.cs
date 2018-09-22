@@ -26,7 +26,7 @@ namespace GTP5Parser
         public bool diez;
         public int octave = 1;
 
-        private NoteInfo[] notesInfo = new NoteInfo[] {
+        private readonly NoteInfo[] notesInfo = new NoteInfo[] {
             new NoteInfo(NoteName.C, false),
             new NoteInfo(NoteName.C, true),
             new NoteInfo(NoteName.D, false),

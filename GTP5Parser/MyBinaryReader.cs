@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
-    class MyBinaryReader : BinaryReader
+    public class BinaryReader : System.IO.BinaryReader
     {
-        Encoding utf8 = Encoding.GetEncoding("UTF-8");
-        Encoding win1251 = Encoding.GetEncoding("Windows-1251");
+        readonly Encoding utf8 = Encoding.GetEncoding("UTF-8");
+        readonly Encoding win1251 = Encoding.GetEncoding("Windows-1251");
 
         public MemoryBlock<byte[]> lastSkipped;
 
-        public MyBinaryReader(Stream input) : base(input)
+        public BinaryReader(Stream input) : base(input)
         {
         }
 
@@ -164,21 +163,7 @@ namespace GTP5Parser
                 Size = stringLength + sizeof(int)
             };
         }
-
-        [Obsolete]
-        public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<MyBinaryReader, TStruct> action) where TStruct : IDisposable, new()
-        {
-            var offset = BaseStream.Position;
-            var structObject = new TStruct();
-            action(this, structObject);
-            return new MemoryBlock<TStruct>
-            {
-                Value = structObject,
-                Offset = offset,
-                Size = BaseStream.Position - offset
-            };
-        }
-
+        
         public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<TStruct> action) where TStruct : IDisposable, new()
         {
             var offset = BaseStream.Position;
@@ -250,13 +235,7 @@ namespace GTP5Parser
             var color = ReadBytes(3);
             return Color.FromBytes(color.Value);
         }
-
-        [Obsolete]
-        public void Jump(long offset)
-        {
-            BaseStream.Seek(offset, SeekOrigin.Begin);
-        }
-
+        
         public MemoryBlock<byte[]> ReadToEnd()
         {
             long offset = BaseStream.Position;

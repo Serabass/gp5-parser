@@ -20,7 +20,8 @@ namespace GTP5Parser
 
         public new string ToString()
         {
-            return string.Format("{0} @ {1:X}", Value.ToString(), Offset);
+            var result = Value.ToString().Replace("\0", "\\0");
+            return string.Format("{0} @ {1:X}", result, Offset);
         }
     }
 }

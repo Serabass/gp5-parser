@@ -32,7 +32,7 @@ namespace GTP5Parser
 
         public TrackMeta Meta;
 
-        public static Track FromReader(BinaryReader reader)
+        public static Track FromReader(System.IO.BinaryReader reader)
         {
             return new Track();
         }
