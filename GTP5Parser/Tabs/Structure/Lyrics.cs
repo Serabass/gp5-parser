@@ -1,15 +1,16 @@
-﻿using System;
+﻿using GTP5Parser.Binary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs.Structure
 {
     public class Lyrics : IDisposable
     {
-        public MemoryBlock<int> Start;
-        public MemoryBlock<string> Content;
+        public Int32MemoryBlock Start;
+        public StringMemoryBlock Content;
 
         public void Dispose()
         {

@@ -1,33 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using GTP5Parser.Binary;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs.Structure
 {
     public class Tab : IDisposable
     {
         public Version Version = new Version();
+        public TabMeta Meta;
 
-        public MemoryBlock<string> Title;
-        public MemoryBlock<string> Subtitle;
-        public MemoryBlock<string> Artist;
-        public MemoryBlock<string> Album;
-        public MemoryBlock<string> LyricsBy;
-        public MemoryBlock<string> Music;
-        public MemoryBlock<string> Copy;
-        public MemoryBlock<string> TabAuthor;
-        public MemoryBlock<string> Instructions;
-        public MemoryBlock<string> Notes;
-
-        public MemoryBlock<short> Moderate;
-        public MemoryBlock<bool> HideTempo;
-        public MemoryBlock<int> BarCount;
-        public MemoryBlock<int> TracksCount;
-        public MemoryBlock<byte> Up;
-        public MemoryBlock<byte> Down;
-        public MemoryBlock<byte[]> KeySigns;
-        public MemoryBlock<byte[]> Link8Notes;
-        public MemoryBlock<int> LyricsTrack;
+        public ShortMemoryBlock Moderate;
+        public BooleanMemoryBlock HideTempo;
+        public Int32MemoryBlock BarCount;
+        public Int32MemoryBlock TracksCount;
+        public ByteMemoryBlock Up;
+        public ByteMemoryBlock Down;
+        public ByteArrayMemoryBlock KeySigns;
+        public ByteArrayMemoryBlock Link8Notes;
+        public Int32MemoryBlock LyricsTrack;
 
         public List<Lyrics> LyricsArray = new List<Lyrics>();
 

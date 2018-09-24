@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs
 {
     public enum KeySignsType {
         Abm = 0xF9,

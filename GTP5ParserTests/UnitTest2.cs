@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GTP5Parser;
+using GTP5Parser.Tabs;
 
 namespace GTP5ParserTests
 {

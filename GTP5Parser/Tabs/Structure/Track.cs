@@ -1,10 +1,11 @@
 ﻿
+using GTP5Parser.Binary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs.Structure
 {
     public struct BarSize
     {
@@ -16,17 +17,17 @@ namespace GTP5Parser
     {
         public const int TRACK_BLOCK_LENGTH = 0xBD;
 
-        public MemoryBlock<byte> Flags;
-        public MemoryBlock<byte> Flags2;
-        public MemoryBlock<string> Title;
-        public MemoryBlock<int> StringsCount;
-        public MemoryBlock<Note>[] Tuning;
-        public MemoryBlock<int> FretCount;
-        public MemoryBlock<int> Capo;
-        public MemoryBlock<int> Port;
-        public MemoryBlock<int> MainChannel;
-        public MemoryBlock<int> EffectChannel;
-        public MemoryBlock<byte> MidiBank;
+        public ByteMemoryBlock Flags;
+        public ByteMemoryBlock Flags2;
+        public StringMemoryBlock Title;
+        public Int32MemoryBlock StringsCount;
+        public Note.MemoryBlock[] Tuning;
+        public Int32MemoryBlock FretCount;
+        public Int32MemoryBlock Capo;
+        public Int32MemoryBlock Port;
+        public Int32MemoryBlock MainChannel;
+        public Int32MemoryBlock EffectChannel;
+        public ByteMemoryBlock MidiBank;
 
         public Color Color;
 

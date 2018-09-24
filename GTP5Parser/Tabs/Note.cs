@@ -1,7 +1,8 @@
 ﻿
+using GTP5Parser.Binary;
 using System.Collections.Generic;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs
 {
     public enum NoteName
     {
@@ -10,6 +11,10 @@ namespace GTP5Parser
 
     public class Note
     {
+        public class MemoryBlock : MemoryBlock<Note> {
+            public MemoryBlock(Note data) : base(data) { }
+        };
+
         private class NoteInfo
         {
             public NoteName note;

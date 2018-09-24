@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs.Structure
 {
     public enum ChordLength : sbyte
     {

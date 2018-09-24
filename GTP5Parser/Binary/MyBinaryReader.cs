@@ -4,27 +4,27 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GTP5Parser
+namespace GTP5Parser.Binary
 {
-    public class BinaryReader : System.IO.BinaryReader
+    public class MyBinaryReader : System.IO.BinaryReader
     {
         readonly Encoding utf8 = Encoding.GetEncoding("UTF-8");
         readonly Encoding win1251 = Encoding.GetEncoding("Windows-1251");
 
-        public MemoryBlock<byte[]> lastSkipped;
+        public ByteArrayMemoryBlock lastSkipped;
 
-        public BinaryReader(Stream input) : base(input)
+        public MyBinaryReader(Stream input) : base(input)
         {
         }
 
-        public new MemoryBlock<string> ReadString()
+        public new StringMemoryBlock ReadString()
         {
             var offset = BaseStream.Position;
             var strLength = ReadByte();
             var bytes = ReadBytes(strLength.Value);
             // byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
             var result = win1251.GetString(bytes.Value);
-            return new MemoryBlock<string>()
+            return new StringMemoryBlock()
             {
                 Value = result,
                 Offset = offset,
@@ -32,106 +32,106 @@ namespace GTP5Parser
             };
         }
 
-        public MemoryBlock<string> ReadString(int maxBytes)
+        public StringMemoryBlock ReadString(int maxBytes)
         {
             var result = ReadString();
             ReadBytes(maxBytes - result.Value.Length);
             return result;
         }
 
-        public new MemoryBlock<float> ReadSingle()
+        public new FloatMemoryBlock ReadSingle()
         {
             var offset = BaseStream.Position;
             var result = base.ReadSingle();
-            return new MemoryBlock<float>()
+            return new FloatMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<double> ReadDouble()
+        public new DoubleMemoryBlock ReadDouble()
         {
             var offset = BaseStream.Position;
             var result = base.ReadDouble();
-            return new MemoryBlock<double>()
+            return new DoubleMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<int> ReadInt32()
+        public new Int32MemoryBlock ReadInt32()
         {
             var offset = BaseStream.Position;
             var result = base.ReadInt32();
-            return new MemoryBlock<int>()
+            return new Int32MemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<short> ReadInt16()
+        public new ShortMemoryBlock ReadInt16()
         {
             var offset = BaseStream.Position;
             var result = base.ReadInt16();
-            return new MemoryBlock<short>()
+            return new ShortMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<bool> ReadBoolean()
+        public new BooleanMemoryBlock ReadBoolean()
         {
             var offset = BaseStream.Position;
             var result = base.ReadBoolean();
-            return new MemoryBlock<bool>()
+            return new BooleanMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<byte[]> ReadBytes(int count)
+        public new ByteArrayMemoryBlock ReadBytes(int count)
         {
             var offset = BaseStream.Position;
             var result = base.ReadBytes(count);
-            return new MemoryBlock<byte[]>()
+            return new ByteArrayMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<byte> ReadByte()
+        public new ByteMemoryBlock ReadByte()
         {
             var offset = BaseStream.Position;
             var result = base.ReadByte();
-            return new MemoryBlock<byte>()
+            return new ByteMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<char> ReadChar()
+        public new CharMemoryBlock ReadChar()
         {
             var offset = BaseStream.Position;
             var result = base.ReadChar();
-            return new MemoryBlock<char>()
+            return new CharMemoryBlock()
             {
                 Offset = offset,
                 Value = result
             };
         }
 
-        public new MemoryBlock<sbyte> ReadSByte()
+        public new SByteMemoryBlock ReadSByte()
         {
             var offset = BaseStream.Position;
             var result = base.ReadSByte();
-            return new MemoryBlock<sbyte>()
+            return new SByteMemoryBlock()
             {
                 Offset = offset,
                 Value = result
@@ -149,14 +149,14 @@ namespace GTP5Parser
             };
         }
 
-        public MemoryBlock<string> ReadLongString()
+        public StringMemoryBlock ReadLongString()
         {
             var offset = BaseStream.Position;
             int stringLength = base.ReadInt32();
             var bytes = ReadBytes(stringLength);
             byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
             var result = win1251.GetString(win1251Bytes);
-            return new MemoryBlock<string>()
+            return new StringMemoryBlock()
             {
                 Value = result,
                 Offset = offset,
@@ -169,6 +169,7 @@ namespace GTP5Parser
             var offset = BaseStream.Position;
             var structObject = new TStruct();
             action(structObject);
+
             return new MemoryBlock<TStruct>
             {
                 Value = structObject,
@@ -230,13 +231,7 @@ namespace GTP5Parser
             BaseStream.Seek(BaseStream.Position - step, SeekOrigin.Begin);
         }
 
-        public Color ReadColor()
-        {
-            var color = ReadBytes(3);
-            return Color.FromBytes(color.Value);
-        }
-        
-        public MemoryBlock<byte[]> ReadToEnd()
+        public ByteArrayMemoryBlock ReadToEnd()
         {
             long offset = BaseStream.Position;
             var result = new List<byte>();
@@ -246,7 +241,7 @@ namespace GTP5Parser
                 result.Add(ReadByte().Value);
             }
 
-            return new MemoryBlock<byte[]>
+            return new ByteArrayMemoryBlock
             {
                 Offset = offset,
                 Value = result.ToArray(),

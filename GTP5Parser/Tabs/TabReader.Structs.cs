@@ -1,76 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using GTP5Parser.Binary;
+using GTP5Parser.Tabs.Structure;
 
-namespace GTP5Parser
+namespace GTP5Parser.Tabs
 {
-    class TabReader : BinaryReader
+    partial class TabReader : MyBinaryReader
     {
-        readonly Stream stream;
-
-        public static string[] SupportedVersions = {
-            "v5.10"
-        };
-
-        private List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
-        private int TrackMetaIterator;
-
-        private bool atEnd => BaseStream.Position >= BaseStream.Length;
-
-        public static Tab ReadTabFromStream(Stream stream)
-        {
-            return new TabReader(stream).ReadTab();
-        }
-
-        public TabReader(Stream stream) : base(stream)
-        {
-            this.stream = stream;
-        }
-
-        public Tab ReadTab()
-        {
-            using (var tab2 = ReadStruct<Tab>(ReadStructTab).Value)
-            {
-                return tab2;
-            }
-        }
-
         private void ReadStructTab(Tab tab)
         {
-            var VersionString = ReadString();
-            var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
-
-            if (!SupportedVersions.Contains(match.Value))
-            {
-                throw new Exception($"Version {VersionString.Value} is not supported yet");
-            }
-
-            tab.Version.Major = int.Parse(match.Groups["major"].Value);
-            tab.Version.Minor = int.Parse(match.Groups["minor"].Value);
-            var unk = ReadBytes(10);
-            tab.Title = ReadString();
-            var unk2 = ReadInt32();
-            tab.Subtitle = ReadString();
-            var unk3 = ReadInt32();
-            tab.Artist = ReadString();
-            var unk4 = ReadInt32();
-            tab.Album = ReadString();
-            var unk5 = ReadInt32();
-            tab.LyricsBy = ReadString();
-            var unk6 = ReadInt32();
-            tab.Music = ReadString();
-            var unk7 = ReadInt32();
-            tab.Copy = ReadString();
-            var unk8 = ReadInt32();
-            tab.TabAuthor = ReadString();
-            var unk9 = ReadInt32();
-            tab.Instructions = ReadString();
-            var unk10 = ReadInt32();
-            var unk10_1 = ReadInt32();
-            tab.Notes = ReadString();
+            tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
+            tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
             tab.LyricsTrack = ReadInt32();
 
             for (int i = 0; i < 5; i++)
@@ -80,12 +22,12 @@ namespace GTP5Parser
             }
 
             Debugger.Break();
-            switch (tab.Version.Minor)
+            switch (tab.Version.ToString())
             {
-                case 0:
+                case "v5.00":
                     Skip(0x1E);
                     break;
-                case 10:
+                case "v5.10":
                     Skip(0x35);
                     break;
             }
@@ -147,6 +89,36 @@ namespace GTP5Parser
             Debugger.Break();
         }
 
+        public void ReadStructVersion(Version version)
+        {
+            var VersionString = ReadString();
+            var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
+
+            if (!SupportedVersions.Contains(match.Value))
+            {
+                throw new VersionNotSupportedException(VersionString.Value);
+            }
+
+            Debugger.Break();
+
+            version.Major = int.Parse(match.Groups["major"].Value);
+            version.Minor = int.Parse(match.Groups["minor"].Value);
+        }
+
+        public void ReadStructTabMeta(TabMeta meta)
+        {
+            meta.Title = (ReadBytes(10), ReadString()).Item2;
+            meta.Subtitle = (ReadInt32(), ReadString()).Item2;
+            meta.Artist = (ReadInt32(), ReadString()).Item2;
+            meta.Album = (ReadInt32(), ReadString()).Item2;
+            meta.LyricsBy = (ReadInt32(), ReadString()).Item2;
+            meta.Music = (ReadInt32(), ReadString()).Item2;
+            meta.Copy = (ReadInt32(), ReadString()).Item2;
+            meta.TabAuthor = (ReadInt32(), ReadString()).Item2;
+            meta.Instructions = (ReadInt32(), ReadString()).Item2;
+            meta.Notes = (ReadInt32(), ReadInt32(), ReadString()).Item3;
+        }
+
         private void ReadStructLyrics(Lyrics lyrics)
         {
             lyrics.Start = ReadInt32();
@@ -155,27 +127,17 @@ namespace GTP5Parser
 
         private void ReadStructTemplate(Template template)
         {
-            template.Title = ReadString();
-            Skip(4);
-            template.Subtitle = ReadString();
-            Skip(4);
-            template.Artist = ReadString();
-            Skip(4);
-            template.Album = ReadString();
-            Skip(4);
-            template.WordsBy = ReadString();
-            Skip(4);
-            template.MusicBy = ReadString();
-            Skip(4);
-            template.WordsAndMusicBy = ReadString();
-            Skip(4);
-            template.Copyright = ReadString();
-            Skip(4);
-            template.Rights = ReadString();
-            Skip(4);
-            template.Page = ReadString();
-            Skip(4);
-            template.Moderate = ReadString();
+            template.Title = (ReadInt32(), ReadString()).Item2;
+            template.Subtitle = (ReadInt32(), ReadString()).Item2;
+            template.Artist = (ReadInt32(), ReadString()).Item2;
+            template.Album = (ReadInt32(), ReadString()).Item2;
+            template.WordsBy = (ReadInt32(), ReadString()).Item2;
+            template.MusicBy = (ReadInt32(), ReadString()).Item2;
+            template.WordsAndMusicBy = (ReadInt32(), ReadString()).Item2;
+            template.Copyright = (ReadInt32(), ReadString()).Item2;
+            template.Rights = (ReadInt32(), ReadString()).Item2;
+            template.Page = (ReadInt32(), ReadString()).Item2;
+            template.Moderate = (ReadInt32(), ReadString()).Item2;
         }
 
         private void ReadStructTrackMeta(TrackMeta trackMeta)
@@ -198,12 +160,12 @@ namespace GTP5Parser
             track.Meta = TrackMetaArray[TrackMetaIterator];
             track.Title = ReadString(0x28);
             track.StringsCount = ReadInt32();
-            track.Tuning = new MemoryBlock<Note>[track.StringsCount.Value];
+            track.Tuning = new Note.MemoryBlock[track.StringsCount.Value];
 
-            for (var o = 0; o < track.StringsCount.Value; o++)
+            for (var i = 0; i < track.StringsCount.Value; i++)
             {
                 var str = ReadInt32();
-                track.Tuning[o] = new MemoryBlock<Note>(new Note(str.Value));
+                track.Tuning[i] = new Note.MemoryBlock(new Note(str.Value));
             }
 
             var remainingStringTuningData = ReadBytes((7 - track.StringsCount.Value) * 4);
@@ -254,6 +216,5 @@ namespace GTP5Parser
             bookmark.Title = ReadString();
             bookmark.Color = ReadColor();
         }
-
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using GTP5Parser.Tabs;
+using GTP5Parser.Tabs.Structure;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GTP5Parser
 {
@@ -11,7 +11,21 @@ namespace GTP5Parser
     {
         static void Main(string[] args)
         {
-            Tab.FromFile("test.gp5");
+            var x = Directory.EnumerateFiles(".\\gtptabs.com", "*.gp5", SearchOption.AllDirectories);
+
+            foreach (string file in x)
+            {
+                try
+                {
+                    Tab tab = Tab.FromFile("re.gp5");
+                    Debugger.Break();
+                }
+                catch (VersionNotSupportedException e)
+                {
+                    continue;
+                }
+            }
+
         }
     }
 
