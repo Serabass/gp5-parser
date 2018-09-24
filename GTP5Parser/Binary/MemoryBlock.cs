@@ -28,8 +28,17 @@
         }
     }
 
+    public class StructMemoryBlock<T> : MemoryBlock<T>
+    {
+    }
+
     public class StringMemoryBlock : MemoryBlock<string>
     {
+        public static implicit operator string(StringMemoryBlock block)
+        {
+            return block.Value;
+        }
+
         public static bool operator ==(StringMemoryBlock block, string value)
         {
             return block.Value == value;
@@ -47,6 +56,10 @@
 
     public class ShortMemoryBlock : MemoryBlock<short>
     {
+        public static implicit operator short(ShortMemoryBlock block)
+        {
+            return block.Value;
+        }
 
         public static bool operator ==(ShortMemoryBlock block, short value)
         {
@@ -58,8 +71,14 @@
             return block.Value != value;
         }
     }
+
     public class BooleanMemoryBlock : MemoryBlock<bool>
     {
+        public static implicit operator bool(BooleanMemoryBlock block)
+        {
+            return block.Value;
+        }
+
         public static bool operator ==(BooleanMemoryBlock block, bool value)
         {
             return block.Value == value;
@@ -70,8 +89,14 @@
             return block.Value != value;
         }
     }
+
     public class Int32MemoryBlock : MemoryBlock<int>
     {
+        public static implicit operator int(Int32MemoryBlock block)
+        {
+            return block.Value;
+        }
+
         public static bool operator ==(Int32MemoryBlock block, int value)
         {
             return block.Value == value;
@@ -108,7 +133,7 @@
 
     public class ByteArrayMemoryBlock : MemoryBlock<byte[]>
     {
-        public static implicit operator byte[](ByteArrayMemoryBlock block)
+        public static implicit operator byte[] (ByteArrayMemoryBlock block)
         {
             return block.Value;
         }
@@ -139,6 +164,7 @@
             return block.Value != value;
         }
     }
+
     public class DoubleMemoryBlock : MemoryBlock<double>
     {
         public static bool operator ==(DoubleMemoryBlock block, double value)
@@ -151,6 +177,7 @@
             return block.Value != value;
         }
     }
+
     public class CharMemoryBlock : MemoryBlock<char>
     {
         public static bool operator ==(CharMemoryBlock block, char value)
@@ -163,6 +190,7 @@
             return block.Value != value;
         }
     }
+
     public class SByteMemoryBlock : MemoryBlock<sbyte>
     {
         public static bool operator ==(SByteMemoryBlock block, sbyte value)

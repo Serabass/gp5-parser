@@ -11,6 +11,7 @@ namespace GTP5Parser.Binary
         readonly Encoding utf8 = Encoding.GetEncoding("UTF-8");
         readonly Encoding win1251 = Encoding.GetEncoding("Windows-1251");
 
+
         public MyBinaryReader(Stream input) : base(input)
         {
         }
@@ -37,13 +38,14 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public MemoryBlock<TStruct> ReadStruct<TStruct>(Action<TStruct> action) where TStruct : IDisposable, new()
+        public StructMemoryBlock<T> ReadStruct<T>(Action<T> action)
+            where T : IDisposable, new()
         {
             var offset = BaseStream.Position;
-            var structObject = new TStruct();
+            var structObject = new T();
             action(structObject);
 
-            return new MemoryBlock<TStruct>
+            return new StructMemoryBlock<T>
             {
                 Value = structObject,
                 Offset = offset,
@@ -58,7 +60,7 @@ namespace GTP5Parser.Binary
 
             while (BaseStream.Length > BaseStream.Position)
             {
-                result.Add(ReadByte());
+                result.Add(Byte);
             }
 
             return new ByteArrayMemoryBlock

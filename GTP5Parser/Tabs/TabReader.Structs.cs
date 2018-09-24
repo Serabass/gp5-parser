@@ -13,7 +13,7 @@ namespace GTP5Parser.Tabs
         {
             tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
             tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
-            tab.LyricsTrack = ReadInt32();
+            tab.LyricsTrack = Int32;
 
             for (int i = 0; i < 5; i++)
             {
@@ -34,9 +34,9 @@ namespace GTP5Parser.Tabs
 
             tab.Template = ReadStruct<Template>(ReadStructTemplate).Value;
 
-            tab.Moderate = ReadInt16();
+            tab.Moderate = Short;
             Skip(0x02);
-            tab.HideTempo = ReadBoolean();
+            tab.HideTempo = Boolean;
             Skip(0x05);
 
             for (TrackMetaIterator = 0; TrackMetaIterator < 64; TrackMetaIterator++)
@@ -45,31 +45,30 @@ namespace GTP5Parser.Tabs
             }
 
             Skip(0x26);
-            var unk13 = ReadInt32();
-            tab.BarCount = ReadInt32();
-            tab.TracksCount = ReadInt32();
-            var unk12 = ReadByte();
-            tab.Up = ReadByte();
-            tab.Down = ReadByte();
+            var unk13 = Int32;
+            tab.BarCount = Int32;
+            tab.TracksCount = Int32;
+            var unk12 = Byte;
+            tab.Up = Byte;
+            tab.Down = Byte;
             tab.KeySigns = this << 2;
             tab.Link8Notes = this << 4;
 
             // Skip(16);
             while (true)
             {
-                SkipWhile(() => ReadByte().Value == 0x00);
-                if (ReadByte().Value == 0x08)
+                SkipWhile(() => Byte == 0x00);
+                if (Byte == 0x08)
                 {
                     Back();
                     break;
                 }
                 Back();
-                var i80 = ReadInt32();
-                Skip(5);
+                var i80 = Int32;
                 tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
             }
 
-            for (var i = 0; i < tab.TracksCount.Value; i++)
+            for (var i = 0; i < tab.TracksCount; i++)
             {
                 tab.AddTrack(ReadStruct<Track>(ReadStructTrack).Value);
             }
@@ -78,7 +77,7 @@ namespace GTP5Parser.Tabs
 
             var xx = 0;
 
-            while (!atEnd)
+            while (!AtEnd)
             {
                 xx++;
                 tab.Chords.Add(ReadStruct<Chord>(ReadStructChord).Value);
@@ -92,11 +91,11 @@ namespace GTP5Parser.Tabs
         public void ReadStructVersion(Version version)
         {
             var VersionString = ~this;
-            var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
+            var match = Regex.Match(VersionString, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
 
             if (!SupportedVersions.Contains(match.Value))
             {
-                throw new VersionNotSupportedException(VersionString.Value);
+                throw new VersionNotSupportedException(VersionString);
             }
 
             Debugger.Break();
@@ -121,8 +120,8 @@ namespace GTP5Parser.Tabs
 
         private void ReadStructLyrics(Lyrics lyrics)
         {
-            lyrics.Start = ReadInt32();
-            lyrics.Content = ReadLongString();
+            lyrics.Start = Int32;
+            lyrics.Content = LongString;
         }
 
         private void ReadStructTemplate(Template template)
@@ -145,49 +144,48 @@ namespace GTP5Parser.Tabs
             var offset = BaseStream.Position;
             trackMeta.Offset = offset;
             trackMeta.Instrument = ReadEnum<MidiInstruments>();
-            trackMeta.Volume = ReadByte();
-            trackMeta.Pan = ReadByte();
-            trackMeta.Chorus = ReadByte();
-            trackMeta.Reverb = ReadByte();
-            trackMeta.Phaser = ReadByte();
-            trackMeta.Tremolo = ReadByte();
+            trackMeta.Volume = Byte;
+            trackMeta.Pan = Byte;
+            trackMeta.Chorus = Byte;
+            trackMeta.Reverb = Byte;
+            trackMeta.Phaser = Byte;
+            trackMeta.Tremolo = Byte;
             Skip(2);
         }
 
         private void ReadStructTrack(Track track)
         {
-            track.Flags = ReadByte();
+            track.Flags = Byte;
             track.Meta = TrackMetaArray[TrackMetaIterator];
             track.Title = this % 0x28;
-            track.StringsCount = ReadInt32();
-            track.Tuning = new Note.MemoryBlock[track.StringsCount.Value];
+            track.StringsCount = Int32;
+            track.Tuning = new Note.MemoryBlock[track.StringsCount];
 
-            for (var i = 0; i < track.StringsCount.Value; i++)
+            for (var i = 0; i < track.StringsCount; i++)
             {
-                var str = ReadInt32();
-                track.Tuning[i] = new Note.MemoryBlock(new Note(str.Value));
+                var str = Int32;
+                track.Tuning[i] = new Note.MemoryBlock(new Note(str));
             }
 
-            var remainingStringTuningData = this << (7 - track.StringsCount.Value) * 4;
-            track.Port = ReadInt32();
-            track.MainChannel = ReadInt32();
-            track.EffectChannel = ReadInt32();
-            track.FretCount = ReadInt32();
-            track.Capo = ReadInt32();
+            var remainingStringTuningData = this << (7 - track.StringsCount) * 4;
+            track.Port = Int32;
+            track.MainChannel = Int32;
+            track.EffectChannel = Int32;
+            track.FretCount = Int32;
+            track.Capo = Int32;
             track.Color = ReadColor();
             Skip(0x36);
             var o0 = ~this;
-            var o1 = ReadInt32();
+            var o1 = Int32;
             var o2 = ~this;
         }
 
         private void ReadStructChord(Chord chord)
         {
-            chord.Flags = ReadByte().Value;
-            var b = ReadSByte();
-            chord.length = (ChordLength)b.Value;
+            chord.Flags = Byte;
+            chord.length = ReadSByteEnum<ChordLength>().Value;
 
-            var stringsBits = ReadByte();
+            var stringsBits = Byte;
 
             List<bool> bits = new List<bool>();
 
@@ -197,15 +195,15 @@ namespace GTP5Parser.Tabs
 
                 if (!bit) continue;
 
-                var flags = ReadByte();
+                var flags = Byte;
                 var bit2 = flags.IsOnAt(5);
                 if (bit2)
                 {
-                    var unk211 = ReadByte();
+                    var unk211 = Byte;
                 }
-                var flags2 = ReadByte();
-                var fret = ReadByte();
-                var unk41 = ReadByte();
+                var flags2 = Byte;
+                var fret = Byte;
+                var unk41 = Byte;
                 chord.notes[i] = fret;
                 Skip(2);
             }

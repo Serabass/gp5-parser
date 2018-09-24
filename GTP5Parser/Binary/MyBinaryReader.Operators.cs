@@ -18,7 +18,7 @@ namespace GTP5Parser.Binary
 
         public static StringMemoryBlock operator ~(MyBinaryReader reader)
         {
-            return reader.ReadString();
+            return reader.String;
         }
 
         public static StringMemoryBlock operator %(MyBinaryReader reader, int count)

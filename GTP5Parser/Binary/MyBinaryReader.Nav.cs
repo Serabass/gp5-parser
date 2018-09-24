@@ -30,32 +30,32 @@ namespace GTP5Parser.Binary
 
         public void SkipWhile(byte b)
         {
-            SkipWhile(() => ReadByte() == b);
+            SkipWhile(() => Byte == b);
         }
 
-        public void SkipWhile(int b)
+        public void SkipWhile(int i)
         {
-            SkipWhile(() => ReadInt32() == b);
+            SkipWhile(() => Int32 == i);
         }
 
-        public void SkipWhile(float b)
+        public void SkipWhile(float f)
         {
-            SkipWhile(() => ReadSingle() == b);
+            SkipWhile(() => Single == f);
         }
 
-        public void SkipWhile(double b)
+        public void SkipWhile(double d)
         {
-            SkipWhile(() => ReadDouble() == b);
+            SkipWhile(() => Double == d);
         }
 
         public void SkipWhile(bool b)
         {
-            SkipWhile(() => ReadBoolean() == b);
+            SkipWhile(() => Boolean == b);
         }
 
-        public void SkipWhile(char b)
+        public void SkipWhile(char c)
         {
-            SkipWhile(() => ReadChar() == b);
+            SkipWhile(() => Char == c);
         }
 
         public void Back(int step = 1)

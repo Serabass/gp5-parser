@@ -8,7 +8,7 @@ namespace GTP5Parser.Binary
 {
     public partial class MyBinaryReader : BinaryReader
     {
-        public new FloatMemoryBlock ReadSingle()
+        private new FloatMemoryBlock ReadSingle()
         {
             var offset = BaseStream.Position;
             var result = base.ReadSingle();
@@ -19,7 +19,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new DoubleMemoryBlock ReadDouble()
+        private new DoubleMemoryBlock ReadDouble()
         {
             var offset = BaseStream.Position;
             var result = base.ReadDouble();
@@ -30,7 +30,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new Int32MemoryBlock ReadInt32()
+        private new Int32MemoryBlock ReadInt32()
         {
             var offset = BaseStream.Position;
             var result = base.ReadInt32();
@@ -41,7 +41,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new ShortMemoryBlock ReadInt16()
+        private new ShortMemoryBlock ReadInt16()
         {
             var offset = BaseStream.Position;
             var result = base.ReadInt16();
@@ -52,7 +52,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new SByteMemoryBlock ReadSByte()
+        private new SByteMemoryBlock ReadSByte()
         {
             var offset = BaseStream.Position;
             var result = base.ReadSByte();
@@ -66,7 +66,7 @@ namespace GTP5Parser.Binary
         public MemoryBlock<T> ReadEnum<T>()
         {
             var offset = BaseStream.Position;
-            var result = (T)Enum.ToObject(typeof(T), base.ReadInt32());
+            var result = (T)Enum.ToObject(typeof(T), Int32);
             return new MemoryBlock<T>()
             {
                 Offset = offset,
@@ -74,7 +74,18 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new ByteMemoryBlock ReadByte()
+        public MemoryBlock<T> ReadSByteEnum<T>()
+        {
+            var offset = BaseStream.Position;
+            var result = (T)Enum.ToObject(typeof(T), SByte);
+            return new MemoryBlock<T>()
+            {
+                Offset = offset,
+                Value = result
+            };
+        }
+
+        private new ByteMemoryBlock ReadByte()
         {
             var offset = BaseStream.Position;
             var result = base.ReadByte();

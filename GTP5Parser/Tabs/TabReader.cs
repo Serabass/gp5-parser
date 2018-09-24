@@ -17,11 +17,16 @@ namespace GTP5Parser.Tabs
         private List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
         private int TrackMetaIterator;
 
-        private bool atEnd => BaseStream.Position >= BaseStream.Length;
+        private bool AtEnd => BaseStream.Position >= BaseStream.Length;
+
+        public static TabReader FromStream(Stream stream)
+        {
+            return new TabReader(stream);
+        }
 
         public static Tab ReadTabFromStream(Stream stream)
         {
-            return new TabReader(stream).ReadTab();
+            return FromStream(stream).ReadTab();
         }
 
         public TabReader(Stream stream) : base(stream)

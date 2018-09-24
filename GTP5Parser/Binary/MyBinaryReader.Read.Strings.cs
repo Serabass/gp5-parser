@@ -11,7 +11,7 @@ namespace GTP5Parser.Binary
         public new StringMemoryBlock ReadString()
         {
             var offset = BaseStream.Position;
-            var strLength = ReadByte();
+            var strLength = Byte;
             var bytes = this << strLength;
             // byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
             var result = win1251.GetString(bytes);
@@ -19,7 +19,7 @@ namespace GTP5Parser.Binary
             {
                 Value = result,
                 Offset = offset,
-                Size = strLength.Value + sizeof(byte)
+                Size = strLength + sizeof(byte)
             };
         }
 
@@ -46,7 +46,7 @@ namespace GTP5Parser.Binary
             var offset = BaseStream.Position;
             int stringLength = base.ReadInt32();
             var bytes = this << stringLength;
-            byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value);
+            byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes);
             var result = win1251.GetString(win1251Bytes);
             return new StringMemoryBlock()
             {
