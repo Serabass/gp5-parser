@@ -39,7 +39,7 @@ namespace GTP5Parser.Tabs
 
         public Color ReadColor()
         {
-            var color = ReadBytes(3);
+            var color = this << 3;
             return Color.FromBytes(color.Value);
         }
     }

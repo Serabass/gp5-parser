@@ -51,8 +51,8 @@ namespace GTP5Parser.Tabs
             var unk12 = ReadByte();
             tab.Up = ReadByte();
             tab.Down = ReadByte();
-            tab.KeySigns = ReadBytes(2);
-            tab.Link8Notes = ReadBytes(4);
+            tab.KeySigns = this << 2;
+            tab.Link8Notes = this << 4;
 
             // Skip(16);
             while (true)
@@ -91,7 +91,7 @@ namespace GTP5Parser.Tabs
 
         public void ReadStructVersion(Version version)
         {
-            var VersionString = ReadString();
+            var VersionString = ~this;
             var match = Regex.Match(VersionString.Value, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
 
             if (!SupportedVersions.Contains(match.Value))
@@ -107,16 +107,16 @@ namespace GTP5Parser.Tabs
 
         public void ReadStructTabMeta(TabMeta meta)
         {
-            meta.Title = (ReadBytes(10), ReadString()).Item2;
-            meta.Subtitle = (ReadInt32(), ReadString()).Item2;
-            meta.Artist = (ReadInt32(), ReadString()).Item2;
-            meta.Album = (ReadInt32(), ReadString()).Item2;
-            meta.LyricsBy = (ReadInt32(), ReadString()).Item2;
-            meta.Music = (ReadInt32(), ReadString()).Item2;
-            meta.Copy = (ReadInt32(), ReadString()).Item2;
-            meta.TabAuthor = (ReadInt32(), ReadString()).Item2;
-            meta.Instructions = (ReadInt32(), ReadString()).Item2;
-            meta.Notes = (ReadInt32(), ReadInt32(), ReadString()).Item3;
+            meta.Title = (this << 10, ~this).Item2;
+            meta.Subtitle = (this << 4, ~this).Item2;
+            meta.Artist = (this << 4, ~this).Item2;
+            meta.Album = (this << 4, ~this).Item2;
+            meta.LyricsBy = (this << 4, ~this).Item2;
+            meta.Music = (this << 4, ~this).Item2;
+            meta.Copy = (this << 4, ~this).Item2;
+            meta.TabAuthor = (this << 4, ~this).Item2;
+            meta.Instructions = (this << 4, ~this).Item2;
+            meta.Notes = (this << 4, ReadInt32(), ~this).Item3;
         }
 
         private void ReadStructLyrics(Lyrics lyrics)
@@ -127,17 +127,17 @@ namespace GTP5Parser.Tabs
 
         private void ReadStructTemplate(Template template)
         {
-            template.Title = (ReadInt32(), ReadString()).Item2;
-            template.Subtitle = (ReadInt32(), ReadString()).Item2;
-            template.Artist = (ReadInt32(), ReadString()).Item2;
-            template.Album = (ReadInt32(), ReadString()).Item2;
-            template.WordsBy = (ReadInt32(), ReadString()).Item2;
-            template.MusicBy = (ReadInt32(), ReadString()).Item2;
-            template.WordsAndMusicBy = (ReadInt32(), ReadString()).Item2;
-            template.Copyright = (ReadInt32(), ReadString()).Item2;
-            template.Rights = (ReadInt32(), ReadString()).Item2;
-            template.Page = (ReadInt32(), ReadString()).Item2;
-            template.Moderate = (ReadInt32(), ReadString()).Item2;
+            template.Title = (this << 4, ~this).Item2;
+            template.Subtitle = (this << 4, ~this).Item2;
+            template.Artist = (this << 4, ~this).Item2;
+            template.Album = (this << 4, ~this).Item2;
+            template.WordsBy = (this << 4, ~this).Item2;
+            template.MusicBy = (this << 4, ~this).Item2;
+            template.WordsAndMusicBy = (this << 4, ~this).Item2;
+            template.Copyright = (this << 4, ~this).Item2;
+            template.Rights = (this << 4, ~this).Item2;
+            template.Page = (this << 4, ~this).Item2;
+            template.Moderate = (this << 4, ~this).Item2;
         }
 
         private void ReadStructTrackMeta(TrackMeta trackMeta)
@@ -158,7 +158,7 @@ namespace GTP5Parser.Tabs
         {
             track.Flags = ReadByte();
             track.Meta = TrackMetaArray[TrackMetaIterator];
-            track.Title = ReadString(0x28);
+            track.Title = this % 0x28;
             track.StringsCount = ReadInt32();
             track.Tuning = new Note.MemoryBlock[track.StringsCount.Value];
 
@@ -168,7 +168,7 @@ namespace GTP5Parser.Tabs
                 track.Tuning[i] = new Note.MemoryBlock(new Note(str.Value));
             }
 
-            var remainingStringTuningData = ReadBytes((7 - track.StringsCount.Value) * 4);
+            var remainingStringTuningData = this << (7 - track.StringsCount.Value) * 4;
             track.Port = ReadInt32();
             track.MainChannel = ReadInt32();
             track.EffectChannel = ReadInt32();
@@ -176,9 +176,9 @@ namespace GTP5Parser.Tabs
             track.Capo = ReadInt32();
             track.Color = ReadColor();
             Skip(0x36);
-            var o0 = ReadString();
+            var o0 = ~this;
             var o1 = ReadInt32();
-            var o2 = ReadString();
+            var o2 = ~this;
         }
 
         private void ReadStructChord(Chord chord)
@@ -193,12 +193,12 @@ namespace GTP5Parser.Tabs
 
             for (var i = 0; i < 8; i++)
             {
-                var bit = (stringsBits.Value & (1 << i - 1)) != 0;
+                var bit = stringsBits.IsOnAt(i);
 
                 if (!bit) continue;
 
                 var flags = ReadByte();
-                var bit2 = (flags.Value & (1 << 5 - 1)) != 0;
+                var bit2 = flags.IsOnAt(5);
                 if (bit2)
                 {
                     var unk211 = ReadByte();
@@ -206,14 +206,14 @@ namespace GTP5Parser.Tabs
                 var flags2 = ReadByte();
                 var fret = ReadByte();
                 var unk41 = ReadByte();
-                chord.notes[i] = fret.Value;
+                chord.notes[i] = fret;
                 Skip(2);
             }
         }
 
         private void ReadStructBookmark(Bookmark bookmark)
         {
-            bookmark.Title = ReadString();
+            bookmark.Title = ~this;
             bookmark.Color = ReadColor();
         }
     }
