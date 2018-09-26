@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using GTP5Parser.Binary;
 using GTP5Parser.Tabs.Structure;
-using Microsoft.SqlServer.Server;
 
 namespace GTP5Parser.Tabs
 {

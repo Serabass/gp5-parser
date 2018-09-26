@@ -1,9 +1,8 @@
 ﻿using System;
-using System.IO;
 
 namespace GTP5Parser.Binary
 {
-    public partial class MyBinaryReader : BinaryReader
+    public partial class MyBinaryReader
     {
         public static ByteArrayMemoryBlock operator <<(MyBinaryReader reader, int count)
         {

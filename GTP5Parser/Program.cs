@@ -1,7 +1,6 @@
 ﻿using GTP5Parser.Tabs;
 using GTP5Parser.Tabs.Structure;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GTP5Parser.Binary
 {
-    public partial class MyBinaryReader : BinaryReader
+    public partial class MyBinaryReader
     {
         public ByteArrayMemoryBlock lastSkipped;
 

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GTP5Parser.Binary;
 using GTP5Parser.Tabs.Structure;
 
 namespace GTP5Parser.Tabs
