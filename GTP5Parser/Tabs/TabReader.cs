@@ -7,18 +7,18 @@ namespace GTP5Parser.Tabs
 {
     partial class TabReader : MyBinaryReader
     {
-        readonly Stream stream;
+        readonly Stream _stream;
 
-        public static string[] SupportedVersions = {
+        public static readonly string[] SupportedVersions = {
             "v5.10"
         };
 
-        private List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
-        private int TrackMetaIterator;
+        private readonly List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
+        private int _trackMetaIterator;
 
         private bool AtEnd => BaseStream.Position >= BaseStream.Length;
 
-        public string Path;
+        public readonly string Path;
         
         public static TabReader FromStream(Stream stream)
         {
@@ -32,7 +32,7 @@ namespace GTP5Parser.Tabs
 
         public TabReader(Stream stream, string path) : base(stream)
         {
-            this.stream = stream;
+            _stream = stream;
             Path = path;
         }
 

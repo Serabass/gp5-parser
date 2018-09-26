@@ -8,7 +8,7 @@ namespace GTP5Parser.Binary
         {
             var offset = BaseStream.Position;
             var result = base.ReadSingle();
-            return new FloatMemoryBlock()
+            return new FloatMemoryBlock
             {
                 Offset = offset,
                 Value = result

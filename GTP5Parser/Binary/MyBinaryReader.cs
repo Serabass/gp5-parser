@@ -7,15 +7,15 @@ namespace GTP5Parser.Binary
 {
     public partial class MyBinaryReader : BinaryReader
     {
-        readonly Encoding utf8 = Encoding.GetEncoding("UTF-8");
-        readonly Encoding win1251 = Encoding.GetEncoding("Windows-1251");
+        private readonly Encoding _utf8 = Encoding.GetEncoding("UTF-8");
+        private readonly Encoding _win1251 = Encoding.GetEncoding("Windows-1251");
 
-        public MyBinaryReader(Stream input) : base(input)
+        protected MyBinaryReader(Stream input) : base(input)
         {
             
         }
 
-        public new BooleanMemoryBlock ReadBoolean()
+        private new BooleanMemoryBlock ReadBoolean()
         {
             var offset = BaseStream.Position;
             var result = base.ReadBoolean();
@@ -26,7 +26,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public new ByteArrayMemoryBlock ReadBytes(int count)
+        private new ByteArrayMemoryBlock ReadBytes(int count)
         {
             var offset = BaseStream.Position;
             var result = base.ReadBytes(count);
@@ -37,7 +37,7 @@ namespace GTP5Parser.Binary
             };
         }
 
-        public StructMemoryBlock<T> ReadStruct<T>(Action<T> action)
+        protected StructMemoryBlock<T> ReadStruct<T>(Action<T> action)
             where T : IDisposable, new()
         {
             var offset = BaseStream.Position;

@@ -49,7 +49,7 @@ namespace GTP5Parser.Tabs
             tab.HideTempo = Boolean;
             Skip(0x05);
 
-            for (TrackMetaIterator = 0; TrackMetaIterator < 64; TrackMetaIterator++)
+            for (_trackMetaIterator = 0; _trackMetaIterator < 64; _trackMetaIterator++)
             {
                 TrackMetaArray.Add(ReadStruct<TrackMeta>(ReadStructTrackMeta).Value);
             }
@@ -170,7 +170,7 @@ namespace GTP5Parser.Tabs
         private void ReadStructTrack(Track track)
         {
             track.Flags = Byte;
-            track.Meta = TrackMetaArray[TrackMetaIterator];
+            track.Meta = TrackMetaArray[_trackMetaIterator];
             track.Title = this % 0x28;
             track.StringsCount = Int32;
             track.Tuning = new Note.MemoryBlock[track.StringsCount];

@@ -5,11 +5,11 @@ namespace GTP5Parser.Binary
 {
     public partial class MyBinaryReader
     {
-        public ByteArrayMemoryBlock lastSkipped;
+        public ByteArrayMemoryBlock LastSkipped;
 
         public void Skip(int count)
         {
-            lastSkipped = this << count;
+            LastSkipped = this << count;
         }
 
         public void SkipWhile(Func<bool> callback)
