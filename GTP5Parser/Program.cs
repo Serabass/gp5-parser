@@ -18,17 +18,15 @@ namespace GTP5Parser
                 {
                     Console.WriteLine("Reading {0}", file);
                     Tab tab = Tab.FromFile(file);
-                    Debugger.Break();
                     break;
                 }
                 catch (VersionNotSupportedException e)
                 {
-                    continue;
+                    Console.WriteLine("Unsupported Version {0}. Skipping", e.Version);
                 }
                 catch (UnknownTabHeaderException e)
                 {
                     Debugger.Break();
-                    continue;
                 }
 
             }

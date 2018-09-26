@@ -11,6 +11,7 @@ namespace GTP5Parser.Tabs
         private void ReadStructTab(Tab tab)
         {
             tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
+            Debugger.Break();
             var b = Byte;
             if (b != 0x80)
             {
@@ -98,19 +99,19 @@ namespace GTP5Parser.Tabs
 
         public void ReadStructVersion(Version version)
         {
-            var VersionString = String;
-            var pattern = @"FICHIER GUITAR PRO (?<version>v(?<major>\d+)\.(?<minor>\d+))$";
+            var versionString = String;
+            const string pattern = @"FICHIER GUITAR PRO (?<version>v(?<major>\d+)\.(?<minor>\d+))$";
 
-            if (!Regex.IsMatch(VersionString, pattern))
+            if (!Regex.IsMatch(versionString, pattern))
             {
                 throw new UnknownTabHeaderException();
             }
 
-            var match = Regex.Match(VersionString, pattern, RegexOptions.Singleline);
+            var match = Regex.Match(versionString, pattern, RegexOptions.Singleline);
 
             if (!SupportedVersions.Contains(match.Groups["version"].Value))
             {
-                throw new VersionNotSupportedException(VersionString);
+                throw new VersionNotSupportedException(versionString);
             }
 
             version.Major = int.Parse(match.Groups["major"].Value);

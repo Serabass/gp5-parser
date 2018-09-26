@@ -8,10 +8,12 @@ namespace GTP5Parser.Tabs
 {
     public class VersionNotSupportedException : Exception
     {
-        public VersionNotSupportedException(string Version) 
+        public string Version;
+
+        public VersionNotSupportedException(string Version)
             : base($"Version {Version} is not supported yet")
         {
-
+            this.Version = Version;
         }
     }
 }
