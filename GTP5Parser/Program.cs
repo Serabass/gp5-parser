@@ -17,13 +17,21 @@ namespace GTP5Parser
             {
                 try
                 {
-                    Tab tab = Tab.FromFile("re.gp5");
+                    Console.WriteLine("Reading {0}", file);
+                    Tab tab = Tab.FromFile(file);
                     Debugger.Break();
+                    break;
                 }
                 catch (VersionNotSupportedException e)
                 {
                     continue;
                 }
+                catch (UnknownTabHeaderException e)
+                {
+                    Debugger.Break();
+                    continue;
+                }
+
             }
 
             return;

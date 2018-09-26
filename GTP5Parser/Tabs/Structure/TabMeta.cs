@@ -14,7 +14,7 @@ namespace GTP5Parser.Tabs.Structure
         public StringMemoryBlock Copy;
         public StringMemoryBlock TabAuthor;
         public StringMemoryBlock Instructions;
-        public StringMemoryBlock Notes;
+        public StringMemoryBlock Notice;
 
         public void Dispose()
         {
@@ -27,7 +27,7 @@ namespace GTP5Parser.Tabs.Structure
             Copy = null;
             TabAuthor = null;
             Instructions = null;
-            Notes = null;
+            Notice = null;
         }
     }
 }

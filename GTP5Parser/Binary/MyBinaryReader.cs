@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace GTP5Parser.Binary
@@ -10,7 +9,6 @@ namespace GTP5Parser.Binary
     {
         readonly Encoding utf8 = Encoding.GetEncoding("UTF-8");
         readonly Encoding win1251 = Encoding.GetEncoding("Windows-1251");
-
 
         public MyBinaryReader(Stream input) : base(input)
         {

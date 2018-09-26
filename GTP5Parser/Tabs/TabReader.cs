@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GTP5Parser.Binary;
 using GTP5Parser.Tabs.Structure;
+using Microsoft.SqlServer.Server;
 
 namespace GTP5Parser.Tabs
 {
@@ -19,9 +20,11 @@ namespace GTP5Parser.Tabs
 
         private bool AtEnd => BaseStream.Position >= BaseStream.Length;
 
+        public string Path;
+        
         public static TabReader FromStream(Stream stream)
         {
-            return new TabReader(stream);
+            return new TabReader(stream, null);
         }
 
         public static Tab ReadTabFromStream(Stream stream)
@@ -29,9 +32,10 @@ namespace GTP5Parser.Tabs
             return FromStream(stream).ReadTab();
         }
 
-        public TabReader(Stream stream) : base(stream)
+        public TabReader(Stream stream, string path) : base(stream)
         {
             this.stream = stream;
+            Path = path;
         }
 
         public Tab ReadTab()

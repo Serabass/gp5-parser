@@ -69,6 +69,7 @@
     <Compile Include="Tabs\Structure\Track.cs" />
     <Compile Include="Tabs\Structure\TrackMeta.cs" />
     <Compile Include="Tabs\Structure\Version.cs" />
+    <Compile Include="Tabs\UnknownTabHeaderException.cs" />
     <Compile Include="Tabs\VersionNotSupportedException.cs" />
   </ItemGroup>
   <ItemGroup>

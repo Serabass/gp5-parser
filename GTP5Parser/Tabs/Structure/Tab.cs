@@ -31,16 +31,15 @@ namespace GTP5Parser.Tabs.Structure
 
         public List<Chord> Chords = new List<Chord>();
 
-        public static Tab FromStream(Stream stream)
+        public static Tab FromStream(Stream stream, string path)
         {
-            return new TabReader(stream)
-                .ReadTab();
+            return new TabReader(stream, path).ReadTab();
         }
 
         public static Tab FromFile(string path = "test2.gp5")
         {
             var stream = File.OpenRead(path);
-            var tab = FromStream(stream);
+            var tab = FromStream(stream, path);
             stream.Close();
             stream.Dispose();
             return tab;

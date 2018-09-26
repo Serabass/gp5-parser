@@ -12,6 +12,14 @@ namespace GTP5Parser.Tabs
         private void ReadStructTab(Tab tab)
         {
             tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
+            var b = Byte;
+            if (b != 0x80)
+            {
+                Debugger.Break();
+            }
+
+            return;
+            Skip(9);
             tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
             tab.LyricsTrack = Int32;
 
@@ -21,13 +29,15 @@ namespace GTP5Parser.Tabs
                 tab.LyricsArray.Add(lyrics);
             }
 
-            Debugger.Break();
             switch (tab.Version.ToString())
             {
                 case "v5.00":
                     Skip(0x1E);
                     break;
                 case "v5.10":
+                    Skip(0x35);
+                    break;
+                default:
                     Skip(0x35);
                     break;
             }
@@ -54,20 +64,19 @@ namespace GTP5Parser.Tabs
             tab.KeySigns = this << 2;
             tab.Link8Notes = this << 4;
 
-            // Skip(16);
-            while (true)
+            switch (Path)
             {
-                SkipWhile(() => Byte == 0x00);
-                if (Byte == 0x08)
-                {
-                    Back();
+                case "re.gp5":
+                    Skip(0x14);
                     break;
-                }
-                Back();
-                var i80 = Int32;
-                tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
+                default:
+                    Debugger.Break();
+                    break;
             }
 
+            tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
+
+            return;
             for (var i = 0; i < tab.TracksCount; i++)
             {
                 tab.AddTrack(ReadStruct<Track>(ReadStructTrack).Value);
@@ -90,15 +99,20 @@ namespace GTP5Parser.Tabs
 
         public void ReadStructVersion(Version version)
         {
-            var VersionString = ~this;
-            var match = Regex.Match(VersionString, @"v(?<major>\d+)\.(?<minor>\d+)$", RegexOptions.Singleline);
+            var VersionString = String;
+            var pattern = @"FICHIER GUITAR PRO (?<version>v(?<major>\d+)\.(?<minor>\d+))$";
 
-            if (!SupportedVersions.Contains(match.Value))
+            if (!Regex.IsMatch(VersionString, pattern))
+            {
+                throw new UnknownTabHeaderException();
+            }
+
+            var match = Regex.Match(VersionString, pattern, RegexOptions.Singleline);
+
+            if (!SupportedVersions.Contains(match.Groups["version"].Value))
             {
                 throw new VersionNotSupportedException(VersionString);
             }
-
-            Debugger.Break();
 
             version.Major = int.Parse(match.Groups["major"].Value);
             version.Minor = int.Parse(match.Groups["minor"].Value);
@@ -106,16 +120,16 @@ namespace GTP5Parser.Tabs
 
         public void ReadStructTabMeta(TabMeta meta)
         {
-            meta.Title = (this << 10, ~this).Item2;
-            meta.Subtitle = (this << 4, ~this).Item2;
-            meta.Artist = (this << 4, ~this).Item2;
-            meta.Album = (this << 4, ~this).Item2;
-            meta.LyricsBy = (this << 4, ~this).Item2;
-            meta.Music = (this << 4, ~this).Item2;
-            meta.Copy = (this << 4, ~this).Item2;
-            meta.TabAuthor = (this << 4, ~this).Item2;
-            meta.Instructions = (this << 4, ~this).Item2;
-            meta.Notes = (this << 4, ReadInt32(), ~this).Item3;
+            meta.Title = String;
+            meta.Subtitle = (this << 4, String).Item2;
+            meta.Artist = (this << 4, String).Item2;
+            meta.Album = (this << 4, String).Item2;
+            meta.LyricsBy = (this << 4, String).Item2;
+            meta.Music = (this << 4, String).Item2;
+            meta.Copy = (this << 4, String).Item2;
+            meta.TabAuthor = (this << 4, String).Item2;
+            meta.Instructions = (this << 4, String).Item2;
+            meta.Notice = (this << 8, String).Item2;
         }
 
         private void ReadStructLyrics(Lyrics lyrics)
@@ -126,17 +140,17 @@ namespace GTP5Parser.Tabs
 
         private void ReadStructTemplate(Template template)
         {
-            template.Title = (this << 4, ~this).Item2;
-            template.Subtitle = (this << 4, ~this).Item2;
-            template.Artist = (this << 4, ~this).Item2;
-            template.Album = (this << 4, ~this).Item2;
-            template.WordsBy = (this << 4, ~this).Item2;
-            template.MusicBy = (this << 4, ~this).Item2;
-            template.WordsAndMusicBy = (this << 4, ~this).Item2;
-            template.Copyright = (this << 4, ~this).Item2;
-            template.Rights = (this << 4, ~this).Item2;
-            template.Page = (this << 4, ~this).Item2;
-            template.Moderate = (this << 4, ~this).Item2;
+            template.Title = String;
+            template.Subtitle = (this << 4, String).Item2;
+            template.Artist = (this << 4, String).Item2;
+            template.Album = (this << 4, String).Item2;
+            template.WordsBy = (this << 4, String).Item2;
+            template.MusicBy = (this << 4, String).Item2;
+            template.WordsAndMusicBy = (this << 4, String).Item2;
+            template.Copyright = (this << 4, String).Item2;
+            template.Rights = (this << 4, String).Item2;
+            template.Page = (this << 4, String).Item2;
+            template.Moderate = (this << 4, String).Item2;
         }
 
         private void ReadStructTrackMeta(TrackMeta trackMeta)
@@ -175,9 +189,9 @@ namespace GTP5Parser.Tabs
             track.Capo = Int32;
             track.Color = ReadColor();
             Skip(0x36);
-            var o0 = ~this;
+            var o0 = String;
             var o1 = Int32;
-            var o2 = ~this;
+            var o2 = String;
         }
 
         private void ReadStructChord(Chord chord)
@@ -201,6 +215,7 @@ namespace GTP5Parser.Tabs
                 {
                     var unk211 = Byte;
                 }
+
                 var flags2 = Byte;
                 var fret = Byte;
                 var unk41 = Byte;
@@ -211,7 +226,7 @@ namespace GTP5Parser.Tabs
 
         private void ReadStructBookmark(Bookmark bookmark)
         {
-            bookmark.Title = ~this;
+            bookmark.Title = String;
             bookmark.Color = ReadColor();
         }
     }
