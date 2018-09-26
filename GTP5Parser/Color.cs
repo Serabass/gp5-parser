@@ -1,4 +1,6 @@
 ﻿
+using GTP5Parser.Binary;
+
 namespace GTP5Parser
 {
     public class Color
@@ -10,7 +12,17 @@ namespace GTP5Parser
                 Red = bytes[0],
                 Green = bytes[1],
                 Blue = bytes[2],
-            }; 
+            };
+        }
+
+        public static Color FromBytes(ByteArrayMemoryBlock bytes)
+        {
+            return new Color()
+            {
+                Red = bytes[0],
+                Green = bytes[1],
+                Blue = bytes[2],
+            };
         }
 
         public byte Red;

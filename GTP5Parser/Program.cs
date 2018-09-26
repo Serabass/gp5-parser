@@ -26,6 +26,7 @@ namespace GTP5Parser
                 }
             }
 
+            return;
         }
     }
 

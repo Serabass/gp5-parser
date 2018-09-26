@@ -1,4 +1,6 @@
-﻿namespace GTP5Parser.Binary
+﻿using System;
+
+namespace GTP5Parser.Binary
 {
     public class MemoryBlock<T>
     {
@@ -28,8 +30,12 @@
         }
     }
 
-    public class StructMemoryBlock<T> : MemoryBlock<T>
+    public class StructMemoryBlock<T> : MemoryBlock<T>, IDisposable where T : IDisposable
     {
+        public void Dispose()
+        {
+            Value.Dispose();
+        }
     }
 
     public class StringMemoryBlock : MemoryBlock<string>
@@ -51,6 +57,11 @@
 
         public char this[int index] => Value[index];
 
+        public override bool Equals(object obj)
+        {
+            return Value == obj;
+        }
+
         public int Length => Value.Length;
     }
 
@@ -70,6 +81,12 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 
     public class BooleanMemoryBlock : MemoryBlock<bool>
@@ -106,11 +123,22 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 
     public class ByteMemoryBlock : MemoryBlock<byte>
     {
         public static implicit operator byte(ByteMemoryBlock block)
+        {
+            return block.Value;
+        }
+
+        public static implicit operator int(ByteMemoryBlock block)
         {
             return block.Value;
         }
@@ -163,6 +191,12 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 
     public class DoubleMemoryBlock : MemoryBlock<double>
@@ -176,6 +210,12 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 
     public class CharMemoryBlock : MemoryBlock<char>
@@ -189,6 +229,12 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 
     public class SByteMemoryBlock : MemoryBlock<sbyte>
@@ -202,5 +248,11 @@
         {
             return block.Value != value;
         }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+
     }
 }

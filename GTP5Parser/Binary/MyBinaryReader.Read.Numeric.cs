@@ -95,6 +95,5 @@ namespace GTP5Parser.Binary
                 Value = result
             };
         }
-
     }
 }

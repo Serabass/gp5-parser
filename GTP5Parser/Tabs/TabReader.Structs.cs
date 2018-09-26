@@ -7,7 +7,7 @@ using GTP5Parser.Tabs.Structure;
 
 namespace GTP5Parser.Tabs
 {
-    partial class TabReader : MyBinaryReader
+    partial class TabReader
     {
         private void ReadStructTab(Tab tab)
         {

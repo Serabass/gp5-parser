@@ -14,6 +14,7 @@ namespace GTP5Parser.Binary
 
         public MyBinaryReader(Stream input) : base(input)
         {
+            
         }
 
         public new BooleanMemoryBlock ReadBoolean()

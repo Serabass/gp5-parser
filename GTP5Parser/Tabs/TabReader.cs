@@ -36,16 +36,15 @@ namespace GTP5Parser.Tabs
 
         public Tab ReadTab()
         {
-            using (var tab2 = ReadStruct<Tab>(ReadStructTab).Value)
+            using (var tab2 = ReadStruct<Tab>(ReadStructTab))
             {
-                return tab2;
+                return tab2.Value;
             }
         }
 
         public Color ReadColor()
         {
-            var color = this << 3;
-            return Color.FromBytes(color.Value);
+            return Color.FromBytes(this << 3);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace GTP5Parser.Binary
         {
             var offset = BaseStream.Position;
             var strLength = Byte;
-            var bytes = this << strLength;
+            var bytes = this << strLength.Value;
             // byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
             var result = win1251.GetString(bytes);
             return new StringMemoryBlock()
