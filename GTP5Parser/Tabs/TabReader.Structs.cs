@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using GTP5Parser.Tabs.Structure;
+using GTP5Parser.Tabs.Structure.Meta;
 using Version = GTP5Parser.Tabs.Structure.Version;
 
 namespace GTP5Parser.Tabs
@@ -13,17 +13,15 @@ namespace GTP5Parser.Tabs
         private Tab ReadStructTab(Tab tab)
         {
             tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
-            Skip(0x06);
-            Console.WriteLine("{0}: {1}", LastSkipped.ToHexString(), Path);
-            // tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
-            return tab;
+            Skip(0x06); // TODO Learn
+            tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
             tab.LyricsTrack = Int32;
-
             for (int i = 0; i < 5; i++)
             {
                 var lyrics = ReadStruct<Lyrics>(ReadStructLyrics).Value;
                 tab.LyricsArray.Add(lyrics);
             }
+
 
             switch (tab.Version.ToString())
             {
@@ -31,7 +29,7 @@ namespace GTP5Parser.Tabs
                     Skip(0x1E);
                     break;
                 case "v5.10":
-                    Skip(0x35);
+                    Skip(0x35); // TODO Learn it!
                     break;
                 default:
                     Skip(0x35);
@@ -39,26 +37,28 @@ namespace GTP5Parser.Tabs
             }
 
             tab.Template = ReadStruct<Template>(ReadStructTemplate).Value;
-
             tab.Moderate = Short;
-            Skip(0x02);
+            Skip(0x02); // Always 00 00
             tab.HideTempo = Boolean;
-            Skip(0x05);
-
+            Skip(0x05); // TODO Learn
             for (_trackMetaIterator = 0; _trackMetaIterator < 64; _trackMetaIterator++)
             {
                 TrackMetaArray.Add(ReadStruct<TrackMeta>(ReadStructTrackMeta).Value);
             }
 
-            Skip(0x26);
-            var unk13 = Int32;
+            Skip(0x26); // TODO Learn
+            var unk13 = Int32; // TODO Learn
             tab.BarCount = Int32;
             tab.TracksCount = Int32;
-            var unk12 = Byte;
+            var unk12 = Byte; // TODO Learn
             tab.Up = Byte;
             tab.Down = Byte;
+
             tab.KeySigns = this << 2;
             tab.Link8Notes = this << 4;
+
+            Console.WriteLine("{0}, {1}", BaseStream.Position.ToString("X5"), Path);
+            return tab;
 
             switch (Path)
             {
@@ -122,11 +122,9 @@ namespace GTP5Parser.Tabs
                 Process.GetCurrentProcess().Kill();
             }
 
-            Console.WriteLine("{0} {1} {2}", Path, meta._Title.Value, meta.Title.Value.Length);
-            
             meta._Subtitle = Int32;
             meta.Subtitle = String;
-            
+
             meta._Artist = Int32;
             meta.Artist = String;
 
@@ -148,8 +146,16 @@ namespace GTP5Parser.Tabs
             meta._Instructions = Int32;
             meta.Instructions = String;
 
-            meta._Notice = Int32;
-            meta.Notice = String;
+            meta.NoticeLineCount = Int32;
+
+            for (var i = 0; i < meta.NoticeLineCount; i++)
+            {
+                meta.Notice.Add(new TabMetaNoticeLine
+                {
+                    Unknown = Int32,
+                    Content = String
+                });
+            }
 
             return meta;
         }

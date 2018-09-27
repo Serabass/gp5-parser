@@ -1,5 +1,7 @@
 ﻿using GTP5Parser.Binary;
 using System;
+using System.Collections.Generic;
+using GTP5Parser.Tabs.Structure.Meta;
 
 namespace GTP5Parser.Tabs.Structure
 {
@@ -23,8 +25,8 @@ namespace GTP5Parser.Tabs.Structure
         public StringMemoryBlock TabAuthor;
         public Int32MemoryBlock _Instructions;
         public StringMemoryBlock Instructions;
-        public Int32MemoryBlock _Notice;
-        public StringMemoryBlock Notice;
+        public Int32MemoryBlock NoticeLineCount;
+        public List<TabMetaNoticeLine> Notice = new List<TabMetaNoticeLine>();
 
         public void Dispose()
         {

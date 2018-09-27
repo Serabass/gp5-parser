@@ -188,7 +188,7 @@ namespace GTP5Parser.Binary
             return string.Join(separator, Value.Select(b => b.ToString("X2")));
         }
 
-        public string ToDecString(string separator = " ")
+        public string ToDecString(string separator = "\t")
         {
             return string.Join(separator, Value.Select(b => b.ToString()));
         }

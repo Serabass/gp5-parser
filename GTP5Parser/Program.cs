@@ -20,6 +20,7 @@ namespace GTP5Parser
                 try
                 {
                     tab = Tab.FromFile(file);
+                    // tab = Tab.FromFile(".\\sorted\\v5.10\\re.gp5");
                 }
                 catch (VersionNotSupportedException e)
                 {
