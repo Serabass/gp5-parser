@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace GTP5Parser.Binary
 {
@@ -67,6 +68,7 @@ namespace GTP5Parser.Binary
 
     public class ShortMemoryBlock : MemoryBlock<short>
     {
+        public new long Size = sizeof(short);
         public static implicit operator short(ShortMemoryBlock block)
         {
             return block.Value;
@@ -91,6 +93,7 @@ namespace GTP5Parser.Binary
 
     public class BooleanMemoryBlock : MemoryBlock<bool>
     {
+        public new long Size = sizeof(bool);
         public static implicit operator bool(BooleanMemoryBlock block)
         {
             return block.Value;
@@ -109,6 +112,7 @@ namespace GTP5Parser.Binary
 
     public class Int32MemoryBlock : MemoryBlock<int>
     {
+        public new long Size = sizeof(int);
         public static implicit operator int(Int32MemoryBlock block)
         {
             return block.Value;
@@ -133,6 +137,7 @@ namespace GTP5Parser.Binary
 
     public class ByteMemoryBlock : MemoryBlock<byte>
     {
+        public new long Size = sizeof(byte);
         public static implicit operator byte(ByteMemoryBlock block)
         {
             return block.Value;
@@ -177,11 +182,21 @@ namespace GTP5Parser.Binary
                 Value[index] = value;
             }
         }
+
+        public string ToHexString(string separator = "  ")
+        {
+            return string.Join(separator, Value.Select(b => b.ToString("X2")));
+        }
+
+        public string ToDecString(string separator = " ")
+        {
+            return string.Join(separator, Value.Select(b => b.ToString()));
+        }
     }
 
     public class FloatMemoryBlock : MemoryBlock<float>
     {
-
+        public new long Size = sizeof(float);
         public static bool operator ==(FloatMemoryBlock block, float value)
         {
             return block.Value == value;
@@ -201,6 +216,7 @@ namespace GTP5Parser.Binary
 
     public class DoubleMemoryBlock : MemoryBlock<double>
     {
+        public new long Size = sizeof(double);
         public static bool operator ==(DoubleMemoryBlock block, double value)
         {
             return block.Value == value;
@@ -220,6 +236,7 @@ namespace GTP5Parser.Binary
 
     public class CharMemoryBlock : MemoryBlock<char>
     {
+        public new long Size = sizeof(char);
         public static bool operator ==(CharMemoryBlock block, char value)
         {
             return block.Value == value;
@@ -239,6 +256,7 @@ namespace GTP5Parser.Binary
 
     public class SByteMemoryBlock : MemoryBlock<sbyte>
     {
+        public new long Size = sizeof(sbyte);
         public static bool operator ==(SByteMemoryBlock block, sbyte value)
         {
             return block.Value == value;
@@ -253,6 +271,5 @@ namespace GTP5Parser.Binary
         {
             return Value.ToString() == obj?.ToString();
         }
-
     }
 }

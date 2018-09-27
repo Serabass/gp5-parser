@@ -50,6 +50,7 @@
     <Compile Include="Binary\MyBinaryReader.Read.Numeric.cs" />
     <Compile Include="Binary\MyBinaryReader.Nav.cs" />
     <Compile Include="Binary\MyBinaryReader.Read.Strings.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Tabs\Structure\Bookmark.cs" />
     <Compile Include="Tabs\Structure\Chord.cs" />
     <Compile Include="Color.cs" />

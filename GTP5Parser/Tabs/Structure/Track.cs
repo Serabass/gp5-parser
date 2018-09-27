@@ -1,8 +1,6 @@
 ﻿
 using GTP5Parser.Binary;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace GTP5Parser.Tabs.Structure
@@ -15,7 +13,7 @@ namespace GTP5Parser.Tabs.Structure
 
     public class Track : IDisposable
     {
-        public const int TRACK_BLOCK_LENGTH = 0xBD;
+        public const int TrackBlockLength = 0xBD;
 
         public ByteMemoryBlock Flags;
         public ByteMemoryBlock Flags2;
@@ -33,7 +31,7 @@ namespace GTP5Parser.Tabs.Structure
 
         public TrackMeta Meta;
 
-        public static Track FromReader(System.IO.BinaryReader reader)
+        public static Track FromReader(BinaryReader reader)
         {
             return new Track();
         }

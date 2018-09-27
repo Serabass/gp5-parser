@@ -53,10 +53,10 @@ namespace GTP5Parser.Tabs.Structure
 
         public void Dispose()
         {
-            LyricsArray.ForEach(lyrics => lyrics.Dispose());
-            Template.Dispose();
-            Chords.ForEach(chord => chord.Dispose());
-            Bookmarks.ForEach(bookmark => bookmark.Dispose());
+            LyricsArray?.ForEach(lyrics => lyrics.Dispose());
+            Template?.Dispose();
+            Chords?.ForEach(chord => chord.Dispose());
+            Bookmarks?.ForEach(bookmark => bookmark.Dispose());
         }
     }
 }

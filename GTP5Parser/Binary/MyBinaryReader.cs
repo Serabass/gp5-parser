@@ -37,12 +37,12 @@ namespace GTP5Parser.Binary
             };
         }
 
-        protected StructMemoryBlock<T> ReadStruct<T>(Action<T> action)
+        protected StructMemoryBlock<T> ReadStruct<T>(Func<T, T> action)
             where T : IDisposable, new()
         {
             var offset = BaseStream.Position;
             var structObject = new T();
-            action(structObject);
+            structObject = action(structObject);
 
             return new StructMemoryBlock<T>
             {

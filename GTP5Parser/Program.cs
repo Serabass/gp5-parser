@@ -3,6 +3,8 @@ using GTP5Parser.Tabs.Structure;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace GTP5Parser
 {
@@ -10,29 +12,24 @@ namespace GTP5Parser
     {
         static void Main(string[] args)
         {
-            var x = Directory.EnumerateFiles(".\\gtptabs.com", "*.gp5", SearchOption.AllDirectories);
+            var x = Directory.EnumerateFiles(".\\sorted\\v5.10", "*.gp5", SearchOption.AllDirectories);
 
             foreach (string file in x)
             {
+                Tab tab;
                 try
                 {
-                    Console.WriteLine("Reading {0}", file);
-                    Tab tab = Tab.FromFile(file);
-                    break;
+                    tab = Tab.FromFile(file);
                 }
                 catch (VersionNotSupportedException e)
                 {
-                    Console.WriteLine("Unsupported Version {0}. Skipping", e.Version);
+                    Debugger.Break();
                 }
                 catch (UnknownTabHeaderException e)
                 {
                     Debugger.Break();
                 }
-
             }
-
-            return;
         }
     }
-
 }

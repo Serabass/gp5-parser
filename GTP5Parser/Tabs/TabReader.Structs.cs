@@ -1,26 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GTP5Parser.Tabs.Structure;
+using Version = GTP5Parser.Tabs.Structure.Version;
 
 namespace GTP5Parser.Tabs
 {
     partial class TabReader
     {
-        private void ReadStructTab(Tab tab)
+        private Tab ReadStructTab(Tab tab)
         {
             tab.Version = ReadStruct<Version>(ReadStructVersion).Value;
-            Debugger.Break();
-            var b = Byte;
-            if (b != 0x80)
-            {
-                Debugger.Break();
-            }
-
-            return;
-            Skip(9);
-            tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
+            Skip(0x06);
+            Console.WriteLine("{0}: {1}", LastSkipped.ToHexString(), Path);
+            // tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
+            return tab;
             tab.LyricsTrack = Int32;
 
             for (int i = 0; i < 5; i++)
@@ -76,7 +72,7 @@ namespace GTP5Parser.Tabs
 
             tab.Bookmarks.Add(ReadStruct<Bookmark>(ReadStructBookmark).Value);
 
-            return;
+            return tab;
             for (var i = 0; i < tab.TracksCount; i++)
             {
                 tab.AddTrack(ReadStruct<Track>(ReadStructTrack).Value);
@@ -97,48 +93,75 @@ namespace GTP5Parser.Tabs
             Debugger.Break();
         }
 
-        public void ReadStructVersion(Version version)
+        public Version ReadStructVersion(Version version)
         {
             var versionString = String;
             const string pattern = @"FICHIER GUITAR PRO (?<version>v(?<major>\d+)\.(?<minor>\d+))$";
 
             if (!Regex.IsMatch(versionString, pattern))
             {
+                _stream.Close();
                 throw new UnknownTabHeaderException();
             }
 
             var match = Regex.Match(versionString, pattern, RegexOptions.Singleline);
 
-            if (!SupportedVersions.Contains(match.Groups["version"].Value))
-            {
-                throw new VersionNotSupportedException(versionString);
-            }
-
             version.Major = int.Parse(match.Groups["major"].Value);
             version.Minor = int.Parse(match.Groups["minor"].Value);
+            return version;
         }
 
-        public void ReadStructTabMeta(TabMeta meta)
+        public TabMeta ReadStructTabMeta(TabMeta meta)
         {
+            meta._Title = Int32;
             meta.Title = String;
-            meta.Subtitle = (this << 4, String).Item2;
-            meta.Artist = (this << 4, String).Item2;
-            meta.Album = (this << 4, String).Item2;
-            meta.LyricsBy = (this << 4, String).Item2;
-            meta.Music = (this << 4, String).Item2;
-            meta.Copy = (this << 4, String).Item2;
-            meta.TabAuthor = (this << 4, String).Item2;
-            meta.Instructions = (this << 4, String).Item2;
-            meta.Notice = (this << 8, String).Item2;
+
+            if (meta._Title.Value != meta.Title.Value.Length + 1)
+            {
+                Debugger.Break();
+                Process.GetCurrentProcess().Kill();
+            }
+
+            Console.WriteLine("{0} {1} {2}", Path, meta._Title.Value, meta.Title.Value.Length);
+            
+            meta._Subtitle = Int32;
+            meta.Subtitle = String;
+            
+            meta._Artist = Int32;
+            meta.Artist = String;
+
+            meta._Album = Int32;
+            meta.Album = String;
+
+            meta._LyricsBy = Int32;
+            meta.LyricsBy = String;
+
+            meta._Music = Int32;
+            meta.Music = String;
+
+            meta._Copy = Int32;
+            meta.Copy = String;
+
+            meta._TabAuthor = Int32;
+            meta.TabAuthor = String;
+
+            meta._Instructions = Int32;
+            meta.Instructions = String;
+
+            meta._Notice = Int32;
+            meta.Notice = String;
+
+            return meta;
         }
 
-        private void ReadStructLyrics(Lyrics lyrics)
+        private Lyrics ReadStructLyrics(Lyrics lyrics)
         {
             lyrics.Start = Int32;
             lyrics.Content = LongString;
+            return lyrics;
         }
 
-        private void ReadStructTemplate(Template template)
+        private Template ReadStructTemplate(Template template)
         {
             template.Title = String;
             template.Subtitle = (this << 4, String).Item2;
@@ -151,9 +174,10 @@ namespace GTP5Parser.Tabs
             template.Rights = (this << 4, String).Item2;
             template.Page = (this << 4, String).Item2;
             template.Moderate = (this << 4, String).Item2;
+            return template;
         }
 
-        private void ReadStructTrackMeta(TrackMeta trackMeta)
+        private TrackMeta ReadStructTrackMeta(TrackMeta trackMeta)
         {
             var offset = BaseStream.Position;
             trackMeta.Offset = offset;
@@ -165,9 +189,10 @@ namespace GTP5Parser.Tabs
             trackMeta.Phaser = Byte;
             trackMeta.Tremolo = Byte;
             Skip(2);
+            return trackMeta;
         }
 
-        private void ReadStructTrack(Track track)
+        private Track ReadStructTrack(Track track)
         {
             track.Flags = Byte;
             track.Meta = TrackMetaArray[_trackMetaIterator];
@@ -192,9 +217,10 @@ namespace GTP5Parser.Tabs
             var o0 = String;
             var o1 = Int32;
             var o2 = String;
+            return track;
         }
 
-        private void ReadStructChord(Chord chord)
+        private Chord ReadStructChord(Chord chord)
         {
             chord.Flags = Byte;
             chord.length = ReadSByteEnum<ChordLength>().Value;
@@ -222,12 +248,15 @@ namespace GTP5Parser.Tabs
                 chord.notes[i] = fret;
                 Skip(2);
             }
+
+            return chord;
         }
 
-        private void ReadStructBookmark(Bookmark bookmark)
+        private Bookmark ReadStructBookmark(Bookmark bookmark)
         {
             bookmark.Title = String;
             bookmark.Color = ReadColor();
+            return bookmark;
         }
     }
 }
