@@ -16,33 +16,15 @@ namespace GTP5Parser.Tabs
             Skip(0x06); // TODO Learn
             tab.Meta = ReadStruct<TabMeta>(ReadStructTabMeta).Value;
             tab.LyricsTrack = Int32;
-            for (int i = 0; i < 5; i++)
-            {
-                var lyrics = ReadStruct<Lyrics>(ReadStructLyrics).Value;
-                tab.LyricsArray.Add(lyrics);
-            }
-
-
-            switch (tab.Version.ToString())
-            {
-                case "v5.00":
-                    Skip(0x1E);
-                    break;
-                case "v5.10":
-                    Skip(0x35); // TODO Learn it!
-                    break;
-                default:
-                    Skip(0x35);
-                    break;
-            }
-
+            tab.LyricsArray = ReadStruct<LyricsList>(ReadStructLyricsList);
+            tab.RSEMasterEffect = ReadStruct<RSEMasterEffect>(ReadMasterEffect);
             tab.Template = ReadStruct<Template>(ReadStructTemplate).Value;
-            tab.Moderate = Short;
-            Skip(0x02); // Always 00 00
+            tab.Moderate = Int32;
             tab.HideTempo = Boolean;
             Skip(0x05); // TODO Learn
             for (_trackMetaIterator = 0; _trackMetaIterator < 64; _trackMetaIterator++)
             {
+                // TODO Rename to MIDIChannel
                 TrackMetaArray.Add(ReadStruct<TrackMeta>(ReadStructTrackMeta).Value);
             }
 
@@ -57,7 +39,7 @@ namespace GTP5Parser.Tabs
             tab.KeySigns = this << 2;
             tab.Link8Notes = this << 4;
 
-            Console.WriteLine("{0}, {1}", BaseStream.Position.ToString("X5"), Path);
+            Console.WriteLine("{0:X5}, {1}", BaseStream.Position, Path);
             return tab;
 
             switch (Path)
@@ -113,53 +95,39 @@ namespace GTP5Parser.Tabs
 
         public TabMeta ReadStructTabMeta(TabMeta meta)
         {
-            meta._Title = Int32;
-            meta.Title = String;
-
-            if (meta._Title.Value != meta.Title.Value.Length + 1)
-            {
-                Debugger.Break();
-                Process.GetCurrentProcess().Kill();
-            }
-
-            meta._Subtitle = Int32;
-            meta.Subtitle = String;
-
-            meta._Artist = Int32;
-            meta.Artist = String;
-
-            meta._Album = Int32;
-            meta.Album = String;
-
-            meta._LyricsBy = Int32;
-            meta.LyricsBy = String;
-
-            meta._Music = Int32;
-            meta.Music = String;
-
-            meta._Copy = Int32;
-            meta.Copy = String;
-
-            meta._TabAuthor = Int32;
-            meta.TabAuthor = String;
-
-            meta._Instructions = Int32;
-            meta.Instructions = String;
-
+            meta.Title = IntByteString;
+            meta.Subtitle = IntByteString;
+            meta.Artist = IntByteString;
+            meta.Album = IntByteString;
+            meta.LyricsBy = IntByteString;
+            meta.Music = IntByteString;
+            meta.Copy = IntByteString;
+            meta.TabAuthor = IntByteString;
+            meta.Instructions = IntByteString;
             meta.NoticeLineCount = Int32;
 
             for (var i = 0; i < meta.NoticeLineCount; i++)
             {
                 meta.Notice.Add(new TabMetaNoticeLine
                 {
-                    Unknown = Int32,
-                    Content = String
+                    Content = IntByteString
                 });
             }
 
             return meta;
         }
 
+        private LyricsList ReadStructLyricsList(LyricsList lyricsList)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                var lyrics = ReadStruct<Lyrics>(ReadStructLyrics).Value;
+                lyricsList.List.Add(lyrics);
+            }
+
+            return lyricsList;
+        }
+        
         private Lyrics ReadStructLyrics(Lyrics lyrics)
         {
             lyrics.Start = Int32;
@@ -167,19 +135,33 @@ namespace GTP5Parser.Tabs
             return lyrics;
         }
 
+        private RSEMasterEffect ReadMasterEffect(RSEMasterEffect masterEffect)
+        {
+            masterEffect.Volume = Int32;
+            Skip(4);
+            masterEffect.Equalizer = ReadStruct<RSEEqualizer>(ReadEqualizer);
+            return masterEffect;
+        }
+
+        private RSEEqualizer ReadEqualizer(RSEEqualizer equalizer)
+        {
+            equalizer.Data = ReadSBytes(11);
+            return equalizer;
+        }
+
         private Template ReadStructTemplate(Template template)
         {
             template.Title = String;
-            template.Subtitle = (this << 4, String).Item2;
-            template.Artist = (this << 4, String).Item2;
-            template.Album = (this << 4, String).Item2;
-            template.WordsBy = (this << 4, String).Item2;
-            template.MusicBy = (this << 4, String).Item2;
-            template.WordsAndMusicBy = (this << 4, String).Item2;
-            template.Copyright = (this << 4, String).Item2;
-            template.Rights = (this << 4, String).Item2;
-            template.Page = (this << 4, String).Item2;
-            template.Moderate = (this << 4, String).Item2;
+            template.Subtitle = IntByteString;
+            template.Artist = IntByteString;
+            template.Album = IntByteString;
+            template.WordsBy = IntByteString;
+            template.MusicBy = IntByteString;
+            template.WordsAndMusicBy = IntByteString;
+            template.Copyright = IntByteString;
+            template.Rights = IntByteString;
+            template.Page = IntByteString;
+            template.Moderate = IntByteString;
             return template;
         }
 
@@ -233,7 +215,7 @@ namespace GTP5Parser.Tabs
 
             var stringsBits = Byte;
 
-            List<bool> bits = new List<bool>();
+            var bits = new List<bool>();
 
             for (var i = 0; i < 8; i++)
             {

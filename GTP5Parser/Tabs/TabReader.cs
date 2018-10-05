@@ -13,6 +13,7 @@ namespace GTP5Parser.Tabs
             "v5.10"
         };
 
+        // TODO Rename to MIDIChannel
         private readonly List<TrackMeta> TrackMetaArray = new List<TrackMeta>();
         private int _trackMetaIterator;
 

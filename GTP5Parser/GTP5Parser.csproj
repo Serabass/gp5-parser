@@ -62,7 +62,10 @@
     <Compile Include="Tabs\Note.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tabs\Structure\LyricsList.cs" />
     <Compile Include="Tabs\Structure\Meta\TabMetaNoticeLine.cs" />
+    <Compile Include="Tabs\Structure\RSEEqualizer.cs" />
+    <Compile Include="Tabs\Structure\RSEMasterEffect.cs" />
     <Compile Include="Tabs\Structure\Tab.cs" />
     <Compile Include="Tabs\Structure\TabMeta.cs" />
     <Compile Include="Tabs\TabReader.cs" />

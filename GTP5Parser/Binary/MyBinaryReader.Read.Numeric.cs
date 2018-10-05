@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace GTP5Parser.Binary
 {
@@ -53,6 +54,17 @@ namespace GTP5Parser.Binary
             var offset = BaseStream.Position;
             var result = base.ReadSByte();
             return new SByteMemoryBlock()
+            {
+                Offset = offset,
+                Value = result
+            };
+        }
+
+        protected SBytesMemoryBlock ReadSBytes(int count)
+        {
+            var offset = BaseStream.Position;
+            var result = base.ReadBytes(count).Select(b => (sbyte)b).ToArray();
+            return new SBytesMemoryBlock
             {
                 Offset = offset,
                 Value = result

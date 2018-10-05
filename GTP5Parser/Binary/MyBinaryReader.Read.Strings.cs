@@ -19,6 +19,22 @@ namespace GTP5Parser.Binary
             };
         }
 
+        public StringMemoryBlock ReadIntByteString()
+        {
+            var offset = BaseStream.Position;
+            var intLength = Int32;
+            var strLength = Byte;
+            var bytes = this << strLength.Value;
+            // byte[] win1251Bytes = Encoding.Convert(utf8, win1251, bytes.Value.ToArray());
+            var result = _win1251.GetString(bytes);
+            return new StringMemoryBlock
+            {
+                Value = result,
+                Offset = offset,
+                Size = strLength + sizeof(byte)
+            };
+        }
+
         public StringMemoryBlock ReadString(int maxBytes)
         {
             var result = ~this;

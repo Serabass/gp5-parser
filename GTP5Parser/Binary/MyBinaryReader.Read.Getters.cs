@@ -6,6 +6,7 @@
         protected ShortMemoryBlock Short => ReadInt16();
         protected Int32MemoryBlock Int32 => ReadInt32();
         protected StringMemoryBlock String => ReadString();
+        protected StringMemoryBlock IntByteString => ReadIntByteString();
         protected StringMemoryBlock LongString => ReadLongString();
         protected ByteMemoryBlock Byte => ReadByte();
         protected SByteMemoryBlock SByte => ReadSByte();

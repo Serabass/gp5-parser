@@ -272,4 +272,23 @@ namespace GTP5Parser.Binary
             return Value.ToString() == obj?.ToString();
         }
     }
+
+    public class SBytesMemoryBlock : MemoryBlock<sbyte[]>
+    {
+        public new long Size = sizeof(sbyte);
+        public static bool operator ==(SBytesMemoryBlock block, sbyte[] value)
+        {
+            return block.Value == value;
+        }
+
+        public static bool operator !=(SBytesMemoryBlock block, sbyte[] value)
+        {
+            return block.Value != value;
+        }
+        
+        public override bool Equals(object obj)
+        {
+            return Value.ToString() == obj?.ToString();
+        }
+    }
 }

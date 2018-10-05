@@ -3,6 +3,7 @@ using System;
 
 namespace GTP5Parser.Tabs.Structure
 {
+    // TODO Rename to MIDIChannel
     public struct TrackMeta : IDisposable
     {
         public long Offset;

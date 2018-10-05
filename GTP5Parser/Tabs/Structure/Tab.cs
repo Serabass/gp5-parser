@@ -10,7 +10,7 @@ namespace GTP5Parser.Tabs.Structure
         public Version Version = new Version();
         public TabMeta Meta;
 
-        public ShortMemoryBlock Moderate;
+        public Int32MemoryBlock Moderate;
         public BooleanMemoryBlock HideTempo;
         public Int32MemoryBlock BarCount;
         public Int32MemoryBlock TracksCount;
@@ -20,7 +20,8 @@ namespace GTP5Parser.Tabs.Structure
         public ByteArrayMemoryBlock Link8Notes;
         public Int32MemoryBlock LyricsTrack;
 
-        public List<Lyrics> LyricsArray = new List<Lyrics>();
+        public StructMemoryBlock<LyricsList> LyricsArray = new StructMemoryBlock<LyricsList>();
+        public StructMemoryBlock<RSEMasterEffect> RSEMasterEffect = new StructMemoryBlock<RSEMasterEffect>();
 
         public Template Template;
 
@@ -53,7 +54,7 @@ namespace GTP5Parser.Tabs.Structure
 
         public void Dispose()
         {
-            LyricsArray?.ForEach(lyrics => lyrics.Dispose());
+            LyricsArray?.Value.List.ForEach(lyrics => lyrics.Dispose());
             Template?.Dispose();
             Chords?.ForEach(chord => chord.Dispose());
             Bookmarks?.ForEach(bookmark => bookmark.Dispose());
